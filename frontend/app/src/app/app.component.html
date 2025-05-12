@@ -1,0 +1,38 @@
+<h1>SportAnalytics Frontend</h1>
+
+<!-- Login- und Registrierungsformular -->
+<div *ngIf="!token">
+  <h2>Login</h2>
+  <input [(ngModel)]="username" placeholder="Benutzername">
+  <input [(ngModel)]="password" type="password" placeholder="Passwort">
+  <button (click)="login()">Login</button>
+  <div style="color:red" *ngIf="loginError">{{loginError}}</div>
+
+  <h2>Registrierung</h2>
+  <input [(ngModel)]="registerUsername" placeholder="Benutzername">
+  <input [(ngModel)]="registerPassword" type="password" placeholder="Passwort">
+  <button (click)="register()">Registrieren</button>
+  <div style="color:red" *ngIf="registerError">{{registerError}}</div>
+</div>
+
+<!-- App-Inhalt nur nach Login -->
+<div *ngIf="token">
+  <button (click)="logout()">Logout</button>
+  <input type="file" (change)="onFileSelected($event)" accept="video/*">
+  <div *ngIf="uploadProgress > 0">Upload: {{uploadProgress}}%</div>
+
+  <h2>Videos</h2>
+  <ul>
+    <li *ngFor="let video of videos" (click)="selectVideo(video)" style="cursor:pointer">
+      {{video.filename}}
+      <button (click)="deleteVideo(video); $event.stopPropagation();">Löschen</button>
+    </li>
+  </ul>
+
+  <div *ngIf="selectedVideo">
+    <h3>{{selectedVideo.filename}}</h3>
+    <video width="480" controls [src]="'http://localhost:5000/api/video/' + selectedVideo._id + '?token=' + token"></video>
+  </div>
+</div>
+
+<router-outlet />
