@@ -42,7 +42,17 @@ export class LoginComponent implements OnInit {
       this.authService.login(username, password).subscribe({
         next: (response) => {
           this.authService.setToken(response.token);
-          this.router.navigate(['/landing']);
+          
+          // After setting the token, check if the user is an admin
+          this.authService.checkAdminStatus().subscribe(isAdmin => {
+            if (isAdmin) {
+              // If the user is an admin, redirect to admin dashboard
+              this.router.navigate(['/admin']);
+            } else {
+              // Otherwise, redirect to landing page
+              this.router.navigate(['/landing']);
+            }
+          });
         },
         error: (error) => {
           this.errorMessage = error.error.message || 'Login failed. Please try again.';

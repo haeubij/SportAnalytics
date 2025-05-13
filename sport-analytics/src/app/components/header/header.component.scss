@@ -48,6 +48,15 @@
   &:hover {
     color: #007bff;
   }
+  
+  &.admin-button {
+    color: #dc3545;
+    font-weight: 500;
+    
+    &:hover {
+      color: #c82333;
+    }
+  }
 }
 
 .auth-buttons {
@@ -81,4 +90,14 @@
   &:hover {
     background-color: #c82333;
   }
+}
+
+.admin-badge {
+  margin: 0 0.5rem;
+  font-size: 0.8rem;
+  background-color: #28a745;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 500;
 } 

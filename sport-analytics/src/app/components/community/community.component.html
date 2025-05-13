@@ -16,7 +16,7 @@
           </video>
         </div>
         <div class="video-info">
-          <p *ngIf="video.uploadedBy">Uploader: {{ video.uploadedBy?.username || 'Unknown User' }}</p>
+          <p *ngIf="video.uploadedBy">Uploader: {{ video.uploadedBy.username || 'Unknown User' }}</p>
           <p *ngIf="!video.uploadedBy">Uploader: Unknown User</p>
           <p>Date: {{ video.uploadedAt | date:'dd.MM.yyyy HH:mm' }}</p>
           <p *ngIf="video.description">{{ video.description }}</p>

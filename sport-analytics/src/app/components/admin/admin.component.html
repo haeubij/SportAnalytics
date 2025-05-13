@@ -1,43 +1,175 @@
 <div class="admin-container">
   <h1>Admin Dashboard</h1>
   
-  <div class="admin-actions">
-    <button class="action-btn" (click)="createAdmin()">Create Admin User</button>
+  <div class="error-message" *ngIf="errorMessage">
+    {{ errorMessage }}
   </div>
   
-  <div class="admin-content">
-    <div class="videos-section">
-      <h2>All Videos</h2>
-      
-      <div class="error-message" *ngIf="errorMessage">
-        {{ errorMessage }}
+  <div class="success-message" *ngIf="successMessage">
+    {{ successMessage }}
+  </div>
+  
+  <div class="search-bar">
+    <input 
+      type="text" 
+      [(ngModel)]="searchTerm" 
+      placeholder="Search users or videos..."
+      class="search-input"
+    >
+  </div>
+  
+  <!-- Password Reset Modal -->
+  <div class="password-modal" *ngIf="selectedUserId">
+    <div class="password-modal-content">
+      <h3>Reset Password</h3>
+      <div class="form-group">
+        <label for="new-password">New Password:</label>
+        <input 
+          type="password" 
+          id="new-password" 
+          [(ngModel)]="newPassword" 
+          placeholder="Enter new password (min. 6 characters)"
+          class="password-input"
+        >
       </div>
-      
-      <div class="loading" *ngIf="loading">
-        Loading videos...
+      <div class="password-actions">
+        <button class="cancel-btn" (click)="cancelPasswordReset()">Cancel</button>
+        <button class="submit-btn" (click)="resetPassword()">Reset Password</button>
       </div>
-      
-      <div class="videos-grid" *ngIf="!loading">
-        <div class="video-card" *ngFor="let video of videos">
-          <h3>{{ video.title }}</h3>
-          <video controls>
-            <source src="http://localhost:3000{{ video.url }}" type="video/mp4">
-            Your browser does not support the video tag.
-          </video>
-          <div class="video-info">
-            <p>Uploader: {{ video.uploadedBy?.username }}</p>
-            <p>Date: {{ video.uploadedAt | date }}</p>
-            <p>ID: {{ video._id }}</p>
-          </div>
-          <div class="video-actions">
-            <button class="delete-btn" (click)="deleteVideo(video._id)">Delete</button>
-          </div>
-        </div>
-      </div>
-      
-      <div class="no-videos" *ngIf="!loading && videos.length === 0">
-        No videos found.
-      </div>
+    </div>
+  </div>
+  
+  <div class="tabs">
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'users'"
+      (click)="setActiveTab('users')"
+    >
+      Benutzer
+    </button>
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'videos'"
+      (click)="setActiveTab('videos')"
+    >
+      Videos
+    </button>
+  </div>
+  
+  <!-- Users Tab -->
+  <div class="tab-content" *ngIf="activeTab === 'users'">
+    <div class="loading" *ngIf="userLoading">
+      Benutzer werden geladen...
+    </div>
+    
+    <div class="users-table" *ngIf="!userLoading && filteredUsers.length > 0">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Benutzername</th>
+            <th>E-Mail</th>
+            <th>Rolle</th>
+            <th>Status</th>
+            <th>Erstellt am</th>
+            <th>Letzter Login</th>
+            <th>Aktionen</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of filteredUsers">
+            <td>{{ user._id }}</td>
+            <td>{{ user.username }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.role }}</td>
+            <td [class.inactive]="!user.isActive">
+              {{ user.isActive ? 'Aktiv' : 'Deaktiviert' }}
+            </td>
+            <td>{{ user.createdAt | date:'dd.MM.yyyy' }}</td>
+            <td>{{ user.lastLogin ? (user.lastLogin | date:'dd.MM.yyyy HH:mm') : 'Nie' }}</td>
+            <td class="actions">
+              <button 
+                class="action-btn password-btn" 
+                (click)="openPasswordReset(user._id!)"
+                [disabled]="user.username === 'admin'"
+              >
+                Passwort zurücksetzen
+              </button>
+              <button 
+                class="action-btn role-btn" 
+                (click)="toggleUserRole(user)"
+                [disabled]="user.username === 'admin'"
+              >
+                {{ user.role === 'admin' ? 'Als User setzen' : 'Als Admin setzen' }}
+              </button>
+              <button 
+                class="action-btn status-btn" 
+                (click)="toggleUserStatus(user)"
+                [disabled]="user.username === 'admin'"
+              >
+                {{ user.isActive ? 'Deaktivieren' : 'Aktivieren' }}
+              </button>
+              <button 
+                class="action-btn delete-btn" 
+                (click)="deleteUser(user._id!)"
+                [disabled]="user.username === 'admin'"
+              >
+                Löschen
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <div class="no-items" *ngIf="!userLoading && filteredUsers.length === 0">
+      Keine Benutzer gefunden.
+    </div>
+  </div>
+  
+  <!-- Videos Tab -->
+  <div class="tab-content" *ngIf="activeTab === 'videos'">
+    <div class="loading" *ngIf="loading">
+      Videos werden geladen...
+    </div>
+    
+    <div class="videos-table" *ngIf="!loading && filteredVideos.length > 0">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Vorschau</th>
+            <th>Titel</th>
+            <th>Uploader</th>
+            <th>Status</th>
+            <th>Hochgeladen am</th>
+            <th>Aktionen</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let video of filteredVideos">
+            <td>{{ video._id }}</td>
+            <td class="video-preview">
+              <video width="100" height="60" controls>
+                <source [src]="'http://localhost:3000' + (video.url || '')" type="video/mp4">
+              </video>
+            </td>
+            <td>{{ video.title }}</td>
+            <td>{{ video.uploadedBy ? video.uploadedBy.username : 'Unbekannt' }}</td>
+            <td>{{ video.isPublic ? 'Öffentlich' : 'Privat' }}</td>
+            <td>{{ video.uploadedAt | date:'dd.MM.yyyy HH:mm' }}</td>
+            <td class="actions">
+              <button class="action-btn delete-btn" (click)="deleteVideo(video._id!)">
+                Löschen
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <div class="no-items" *ngIf="!loading && filteredVideos.length === 0">
+      Keine Videos gefunden.
     </div>
   </div>
 </div> 
