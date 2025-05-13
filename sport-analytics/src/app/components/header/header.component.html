@@ -4,17 +4,28 @@
       SportAnalytics
     </div>
     
-    <nav class="nav-menu" *ngIf="isLoggedIn()">
-      <button class="nav-button" (click)="goToLanding()">
-        Home
-      </button>
-      <button class="nav-button" (click)="goToVideoAnalysis()">
-        Video Analysis
+    <nav class="nav-menu">
+      <!-- These are only for logged in users -->
+      <ng-container *ngIf="isLoggedIn()">
+        <button class="nav-button" (click)="goToLanding()">
+          Home
+        </button>
+        <button class="nav-button" (click)="goToVideoAnalysis()">
+          Video Analysis
+        </button>
+      </ng-container>
+      
+      <!-- Community is available for everyone -->
+      <button class="nav-button" (click)="goToCommunity()">
+        Community
       </button>
     </nav>
 
-    <div class="auth-buttons" *ngIf="isLoggedIn()">
-      <button class="logout-button" (click)="logout()">
+    <div class="auth-buttons">
+      <button class="login-button" *ngIf="!isLoggedIn()" (click)="goToLogin()">
+        Login
+      </button>
+      <button class="logout-button" *ngIf="isLoggedIn()" (click)="logout()">
         Logout
       </button>
     </div>

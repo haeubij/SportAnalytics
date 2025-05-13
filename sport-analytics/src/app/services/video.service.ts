@@ -19,9 +19,20 @@ export class VideoService {
     });
   }
 
-  // Get all videos
+  // Get all videos (requires auth)
   getVideos(): Observable<Video[]> {
     return this.http.get<Video[]>(`${this.apiUrl}/videos`, { headers: this.getAuthHeaders() });
+  }
+
+  // Get public videos (no auth required)
+  getPublicVideos(): Observable<Video[]> {
+    console.log('Requesting public videos directly from main server');
+    // Explizit ohne Auth-Header anfragen
+    return this.http.get<Video[]>(`${this.apiUrl}/videos/public`, {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json'
+      })
+    });
   }
 
   // Upload new video

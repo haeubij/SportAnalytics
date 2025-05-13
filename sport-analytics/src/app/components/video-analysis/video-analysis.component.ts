@@ -22,6 +22,7 @@ export class VideoAnalysisComponent implements OnInit {
   loading: boolean = false;
   showUploadModal: boolean = false;
   videoDescription: string = '';
+  isPublic: boolean = false;
 
   constructor(
     private videoService: VideoService,
@@ -69,6 +70,7 @@ export class VideoAnalysisComponent implements OnInit {
     this.videoDescription = '';
     this.selectedFile = null;
     this.errorMessage = '';
+    this.isPublic = false;
   }
 
   // Handle file selection
@@ -92,6 +94,8 @@ export class VideoAnalysisComponent implements OnInit {
     if (this.videoDescription.trim()) {
       formData.append('description', this.videoDescription.trim());
     }
+    
+    formData.append('isPublic', this.isPublic.toString());
 
     console.log('FormData entries:');
     // Ausgabe aller FormData-Elemente (Debug)
