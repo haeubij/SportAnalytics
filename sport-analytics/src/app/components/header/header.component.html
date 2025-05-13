@@ -1,0 +1,22 @@
+<header class="header">
+  <div class="header-content">
+    <div class="logo" (click)="goToLanding()">
+      SportAnalytics
+    </div>
+    
+    <nav class="nav-menu" *ngIf="isLoggedIn()">
+      <button class="nav-button" (click)="goToLanding()">
+        Home
+      </button>
+      <button class="nav-button" (click)="goToVideoAnalysis()">
+        Video Analysis
+      </button>
+    </nav>
+
+    <div class="auth-buttons" *ngIf="isLoggedIn()">
+      <button class="logout-button" (click)="logout()">
+        Logout
+      </button>
+    </div>
+  </div>
+</header> 

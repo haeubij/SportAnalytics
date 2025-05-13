@@ -1,0 +1,43 @@
+<div class="admin-container">
+  <h1>Admin Dashboard</h1>
+  
+  <div class="admin-actions">
+    <button class="action-btn" (click)="createAdmin()">Create Admin User</button>
+  </div>
+  
+  <div class="admin-content">
+    <div class="videos-section">
+      <h2>All Videos</h2>
+      
+      <div class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+      
+      <div class="loading" *ngIf="loading">
+        Loading videos...
+      </div>
+      
+      <div class="videos-grid" *ngIf="!loading">
+        <div class="video-card" *ngFor="let video of videos">
+          <h3>{{ video.title }}</h3>
+          <video controls>
+            <source src="http://localhost:3000{{ video.url }}" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+          <div class="video-info">
+            <p>Uploader: {{ video.uploadedBy?.username }}</p>
+            <p>Date: {{ video.uploadedAt | date }}</p>
+            <p>ID: {{ video._id }}</p>
+          </div>
+          <div class="video-actions">
+            <button class="delete-btn" (click)="deleteVideo(video._id)">Delete</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="no-videos" *ngIf="!loading && videos.length === 0">
+        No videos found.
+      </div>
+    </div>
+  </div>
+</div> 

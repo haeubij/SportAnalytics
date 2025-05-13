@@ -1,0 +1,26 @@
+/* Importiere Source Sans Pro von Fontsource */
+@import "~@fontsource/source-sans-pro/300.css"; /* Light */
+@import "~@fontsource/source-sans-pro/400.css"; /* Regular */
+@import "~@fontsource/source-sans-pro/600.css"; /* Semibold */
+@import "~@fontsource/source-sans-pro/700.css"; /* Bold */
+@import "~@fontsource/source-sans-pro/400-italic.css"; /* Italic */
+
+/* Globale Stile */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #333;
+  background-color: #f8f9fa;
+}
+
+button, input, select, textarea {
+  font-family: 'Source Sans Pro', sans-serif;
+} 

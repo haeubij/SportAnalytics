@@ -1,0 +1,62 @@
+<div class="video-analysis-container">
+  <h1>Video Analysis</h1>
+  
+  <div class="upload-section">
+    <h2>Upload New Video</h2>
+    <div class="upload-form">
+      <div class="file-input">
+        <input
+          type="file"
+          accept="video/mp4,video/webm,video/ogg"
+          (change)="onFileSelected($event)"
+        />
+      </div>
+      <button 
+        class="upload-btn" 
+        [disabled]="!selectedFile || loading" 
+        (click)="uploadVideo()"
+      >
+        Upload Video
+      </button>
+    </div>
+    
+    <div class="error-message" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+  </div>
+  
+  <div class="videos-container">
+    <h2>My Videos</h2>
+    
+    <div class="loading" *ngIf="loading">
+      Loading videos...
+    </div>
+    
+    <div class="videos-grid" *ngIf="!loading; else loadingTemplate">
+      <div class="video-card" *ngFor="let video of videos">
+        <h3>{{ video.title }}</h3>
+        <div class="video-wrapper">
+          <video controls width="320" height="180">
+            <source src="http://localhost:3000{{ video.url }}" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+        <div class="video-info">
+          <p>Uploader: {{ video.uploadedBy?.username }}</p>
+          <p>Date: {{ video.uploadedAt | date }}</p>
+        </div>
+        <div class="video-actions">
+          <button class="delete-btn" (click)="deleteVideo(video._id)">Delete</button>
+        </div>
+      </div>
+    </div>
+    
+    <ng-template #loadingTemplate>
+      <div class="loading-message">Loading videos...</div>
+    </ng-template>
+    
+    <div class="no-videos" *ngIf="!loading && videos.length === 0">
+      No videos found. Upload your first video!
+    </div>
+  </div>
+</div> 
