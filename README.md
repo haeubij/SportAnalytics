@@ -100,3 +100,7 @@ The frontend is now accessible at http://localhost:4200.
 - `src/app/components/` - Angular components
 - `src/app/services/` - Angular services
 - `src/app/interfaces/` - TypeScript interfaces
+
+
+### Admin
+- PW = Y4Y4i)Dhv>0<

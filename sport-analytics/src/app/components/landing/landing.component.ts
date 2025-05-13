@@ -11,6 +11,8 @@ import { AuthService } from '../../services/auth.service';
   imports: [CommonModule]
 })
 export class LandingComponent implements OnInit {
+  isUserLoggedIn: boolean = false;
+
   constructor(
     private router: Router,
     private authService: AuthService
@@ -18,13 +20,30 @@ export class LandingComponent implements OnInit {
 
   ngOnInit(): void {
     // Check if user is logged in
-    if (!this.authService.isLoggedIn()) {
-      this.router.navigate(['/login']);
-    }
+    this.isUserLoggedIn = this.authService.isLoggedIn();
   }
 
   // Navigate to video analysis page
   goToVideoAnalysis(): void {
-    this.router.navigate(['/video-analysis']);
+    if (this.isUserLoggedIn) {
+      this.router.navigate(['/video-analysis']);
+    } else {
+      this.router.navigate(['/login']);
+    }
+  }
+
+  // Navigate to login page
+  goToLogin(): void {
+    this.router.navigate(['/login']);
+  }
+
+  // Navigate to register page
+  goToRegister(): void {
+    this.router.navigate(['/register']);
+  }
+
+  // Navigate to community page
+  goToCommunity(): void {
+    this.router.navigate(['/community']);
   }
 } 

@@ -106,13 +106,22 @@ router.post('/upload', auth, async (req, res) => {
 });
 
 // @route   GET api/videos
-// @desc    Get all videos
+// @desc    Get all videos for current user (or all for admin)
 // @access  Private
 router.get('/', auth, async (req, res) => {
   try {
-    const videos = await Video.find()
+    // Wenn Benutzer Admin ist, alle Videos zurückgeben
+    // Ansonsten nur eigene Videos
+    const query = req.user.role === 'admin' ? {} : { uploadedBy: req.user.id };
+    
+    console.log('User requesting videos:', req.user.id, 'Role:', req.user.role);
+    console.log('Using query:', query);
+    
+    const videos = await Video.find(query)
       .populate('uploadedBy', 'username')
       .sort({ uploadedAt: -1 });
+      
+    console.log(`Found ${videos.length} videos for user`);
     res.json(videos);
   } catch (err) {
     console.error(err.message);

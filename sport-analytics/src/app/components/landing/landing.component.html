@@ -2,6 +2,12 @@
   <div class="hero-section">
     <h1>Welcome to SportAnalytics</h1>
     <p class="subtitle">Your Ultimate Sports Video Analysis Platform</p>
+    
+    <!-- Auth buttons for non-logged in users -->
+    <div class="hero-actions" *ngIf="!isUserLoggedIn">
+      <button class="primary-button" (click)="goToLogin()">Login</button>
+      <button class="secondary-button" (click)="goToRegister()">Register</button>
+    </div>
   </div>
 
   <div class="features-section">
@@ -19,14 +25,19 @@
         <h3>Team Collaboration</h3>
         <p>Share videos and insights with your team members</p>
       </div>
+      <div class="feature-card">
+        <h3>Community</h3>
+        <p>Discover public videos shared by other sports enthusiasts</p>
+      </div>
     </div>
   </div>
 
   <div class="cta-section">
     <h2>Ready to Get Started?</h2>
-    <p>Begin analyzing your sports videos today</p>
+    <p *ngIf="isUserLoggedIn">Begin analyzing your sports videos today</p>
+    <p *ngIf="!isUserLoggedIn">Create an account or login to start analyzing your videos</p>
     <button class="cta-button" (click)="goToVideoAnalysis()">
-      Go to Video Analysis
+      {{ isUserLoggedIn ? 'Go to Video Analysis' : 'Get Started Now' }}
     </button>
   </div>
 
@@ -49,5 +60,13 @@
         <p>Share insights with your team and track progress</p>
       </div>
     </div>
+  </div>
+  
+  <div class="community-section">
+    <h2>Community Videos</h2>
+    <p>Check out videos shared by other sports enthusiasts in our community</p>
+    <button class="community-button" (click)="goToCommunity()">
+      Browse Community Videos
+    </button>
   </div>
 </div> 
