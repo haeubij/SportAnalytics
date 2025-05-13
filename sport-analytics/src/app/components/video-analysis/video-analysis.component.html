@@ -1,32 +1,11 @@
 <div class="video-analysis-container">
   <h1>Video Analysis</h1>
   
-  <div class="upload-section">
-    <h2>Upload New Video</h2>
-    <div class="upload-form">
-      <div class="file-input">
-        <input
-          type="file"
-          accept="video/mp4,video/webm,video/ogg"
-          (change)="onFileSelected($event)"
-        />
-      </div>
-      <button 
-        class="upload-btn" 
-        [disabled]="!selectedFile || loading" 
-        (click)="uploadVideo()"
-      >
-        Upload Video
-      </button>
-    </div>
-    
-    <div class="error-message" *ngIf="errorMessage">
-      {{ errorMessage }}
-    </div>
-  </div>
-  
   <div class="videos-container">
-    <h2>My Videos</h2>
+    <div class="videos-header">
+      <h2>My Videos</h2>
+      <button class="upload-btn" (click)="openUploadModal()">Upload Video</button>
+    </div>
     
     <div class="loading" *ngIf="loading">
       Loading videos...
@@ -42,8 +21,9 @@
           </video>
         </div>
         <div class="video-info">
-          <p>Uploader: {{ video.uploadedBy?.username }}</p>
+          <p>Uploader: {{ video.uploadedBy.username }}</p>
           <p>Date: {{ video.uploadedAt | date }}</p>
+          <p *ngIf="video.description">{{ video.description }}</p>
         </div>
         <div class="video-actions">
           <button class="delete-btn" (click)="deleteVideo(video._id)">Delete</button>
@@ -56,7 +36,61 @@
     </ng-template>
     
     <div class="no-videos" *ngIf="!loading && videos.length === 0">
-      No videos found. Upload your first video!
+      <p>No videos found. Upload your first video!</p>
+      <button class="upload-btn" (click)="openUploadModal()">Upload Video</button>
     </div>
   </div>
+  
+  <!-- Upload Modal -->
+  <div class="modal" *ngIf="showUploadModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Upload New Video</h2>
+        <button class="close-btn" (click)="closeUploadModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="video-file">Select Video</label>
+          <div class="file-input-wrapper">
+            <button class="file-select-btn">Choose File</button>
+            <input
+              type="file"
+              id="video-file"
+              accept="video/mp4,video/webm,video/ogg"
+              (change)="onFileSelected($event)"
+            />
+            <span class="file-name">{{ selectedFile ? selectedFile.name : 'No file chosen' }}</span>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="video-description">Description (optional)</label>
+          <textarea 
+            id="video-description" 
+            [(ngModel)]="videoDescription" 
+            placeholder="Enter video description"
+            rows="3"
+          ></textarea>
+        </div>
+        
+        <div class="error-message" *ngIf="errorMessage">
+          {{ errorMessage }}
+        </div>
+        
+        <div class="modal-actions">
+          <button class="cancel-btn" (click)="closeUploadModal()">Cancel</button>
+          <button 
+            class="upload-btn" 
+            [disabled]="!selectedFile || loading" 
+            (click)="uploadVideo()"
+          >
+            Upload Video
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Modal Backdrop -->
+  <div class="modal-backdrop" *ngIf="showUploadModal" (click)="closeUploadModal()"></div>
 </div> 

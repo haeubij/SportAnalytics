@@ -31,31 +31,56 @@ const upload = multer({
       cb(new Error('Invalid file type. Only MP4, WebM, and OGG videos are allowed.'));
     }
   }
-});
+}).single('video');
 
 // @route   POST api/videos/upload
 // @desc    Upload a video
 // @access  Private
-router.post('/upload', auth, upload.single('video'), async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ message: 'No video file uploaded' });
+router.post('/upload', auth, async (req, res) => {
+  upload(req, res, async (err) => {
+    if (err) {
+      console.error('Multer error:', err);
+      return res.status(400).json({ message: err.message });
     }
+    
+    try {
+      console.log('Upload request received:');
+      console.log('req.body:', req.body);
+      console.log('req.file:', req.file ? { 
+        originalname: req.file.originalname,
+        size: req.file.size,
+        mimetype: req.file.mimetype 
+      } : 'No file');
+      
+      if (!req.file) {
+        return res.status(400).json({ message: 'No video file uploaded' });
+      }
 
-    const video = new Video({
-      title: req.file.originalname,
-      description: req.body.description || '',
-      url: `/uploads/${req.file.filename}`,
-      filePath: req.file.path,
-      uploadedBy: req.user.id
-    });
+      // Extract clean title from filename if no title is provided
+      let videoTitle = req.body.title;
+      if (!videoTitle) {
+        // Get filename without extension and replace underscores/hyphens with spaces
+        const filename = req.file.originalname;
+        videoTitle = filename.split('.').slice(0, -1).join('.')
+          .replace(/_/g, ' ').replace(/-/g, ' ');
+      }
 
-    await video.save();
-    res.json(video);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
-  }
+      const video = new Video({
+        title: videoTitle,
+        description: req.body.description || '',
+        url: `/uploads/${req.file.filename}`,
+        filePath: req.file.path,
+        uploadedBy: req.user.id
+      });
+
+      console.log('Creating video with title:', video.title);
+      await video.save();
+      res.json(video);
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Server error');
+    }
+  });
 });
 
 // @route   GET api/videos

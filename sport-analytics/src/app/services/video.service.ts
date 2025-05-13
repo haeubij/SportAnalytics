@@ -26,7 +26,17 @@ export class VideoService {
 
   // Upload new video
   uploadVideo(videoData: FormData): Observable<any> {
-    return this.http.post(`${this.apiUrl}/videos/upload`, videoData, { headers: this.getAuthHeaders() });
+    // Verwende nur den Auth-Token, ohne Content-Type zu setzen (wird automatisch für FormData gesetzt)
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'x-auth-token': token ? token : ''
+    });
+    
+    console.log('Uploading video with FormData:', videoData);
+    
+    return this.http.post(`${this.apiUrl}/videos/upload`, videoData, { 
+      headers: headers 
+    });
   }
 
   // Get video by ID

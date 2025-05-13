@@ -4,13 +4,14 @@ import { VideoService } from '../../services/video.service';
 import { Video } from '../../interfaces/video.interface';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-video-analysis',
   templateUrl: './video-analysis.component.html',
   styleUrls: ['./video-analysis.component.scss'],
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   providers: [DatePipe]
 })
 export class VideoAnalysisComponent implements OnInit {
@@ -19,6 +20,8 @@ export class VideoAnalysisComponent implements OnInit {
   uploadProgress: number = 0;
   errorMessage: string = '';
   loading: boolean = false;
+  showUploadModal: boolean = false;
+  videoDescription: string = '';
 
   constructor(
     private videoService: VideoService,
@@ -49,6 +52,25 @@ export class VideoAnalysisComponent implements OnInit {
     });
   }
 
+  // Open upload modal
+  openUploadModal(): void {
+    this.showUploadModal = true;
+    this.resetUploadForm();
+  }
+
+  // Close upload modal
+  closeUploadModal(): void {
+    this.showUploadModal = false;
+    this.resetUploadForm();
+  }
+
+  // Reset upload form
+  resetUploadForm(): void {
+    this.videoDescription = '';
+    this.selectedFile = null;
+    this.errorMessage = '';
+  }
+
   // Handle file selection
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -66,16 +88,31 @@ export class VideoAnalysisComponent implements OnInit {
 
     const formData = new FormData();
     formData.append('video', this.selectedFile);
+    
+    if (this.videoDescription.trim()) {
+      formData.append('description', this.videoDescription.trim());
+    }
+
+    console.log('FormData entries:');
+    // Ausgabe aller FormData-Elemente (Debug)
+    formData.forEach((value, key) => {
+      if (key === 'video') {
+        console.log(key, ':', 'File object');
+      } else {
+        console.log(key, ':', value);
+      }
+    });
 
     this.loading = true;
     this.videoService.uploadVideo(formData).subscribe({
       next: (response) => {
+        console.log('Upload response:', response);
         this.loadVideos();
-        this.selectedFile = null;
-        this.uploadProgress = 0;
+        this.closeUploadModal();
         this.loading = false;
       },
       error: (error) => {
+        console.error('Upload error:', error);
         this.errorMessage = 'Error uploading video. Please try again.';
         this.loading = false;
       }
