@@ -18,6 +18,10 @@ const videoSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  isPublic: {
+    type: Boolean,
+    default: false
+  },
   uploadedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

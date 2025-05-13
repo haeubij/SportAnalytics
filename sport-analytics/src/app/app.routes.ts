@@ -3,6 +3,7 @@ import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
 import { LandingComponent } from './components/landing/landing.component';
 import { VideoAnalysisComponent } from './components/video-analysis/video-analysis.component';
+import { CommunityComponent } from './components/community/community.component';
 import { AuthService } from './services/auth.service';
 import { inject } from '@angular/core';
 
@@ -16,5 +17,6 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'landing', component: LandingComponent, canActivate: [authGuard] },
   { path: 'video-analysis', component: VideoAnalysisComponent, canActivate: [authGuard] },
+  { path: 'community', component: CommunityComponent },
   { path: '', redirectTo: '/login', pathMatch: 'full' }
 ];

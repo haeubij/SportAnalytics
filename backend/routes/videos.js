@@ -6,6 +6,27 @@ const fs = require('fs');
 const Video = require('../models/Video');
 const auth = require('../middleware/auth');
 
+// NOTE: The public videos route is now handled directly in server.js
+// This route is kept here as reference but is no longer used
+/*
+// @route   GET api/videos/public
+// @desc    Get all public videos
+// @access  Public (no auth required)
+router.get('/public', async (req, res) => {
+  try {
+    console.log('Fetching public videos');
+    const videos = await Video.find({ isPublic: true })
+      .populate('uploadedBy', 'username')
+      .sort({ uploadedAt: -1 });
+    console.log(`Found ${videos.length} public videos`);
+    res.json(videos);
+  } catch (err) {
+    console.error('Error fetching public videos:', err.message);
+    res.status(500).send('Server error');
+  }
+});
+*/
+
 // Configure multer for video upload
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -70,7 +91,8 @@ router.post('/upload', auth, async (req, res) => {
         description: req.body.description || '',
         url: `/uploads/${req.file.filename}`,
         filePath: req.file.path,
-        uploadedBy: req.user.id
+        uploadedBy: req.user.id,
+        isPublic: req.body.isPublic === 'true'
       });
 
       console.log('Creating video with title:', video.title);

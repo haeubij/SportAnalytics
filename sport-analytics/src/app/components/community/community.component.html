@@ -1,0 +1,36 @@
+<div class="community-container">
+  <h1>Community Videos</h1>
+  
+  <div class="videos-container">
+    <div class="loading" *ngIf="loading">
+      Loading videos...
+    </div>
+    
+    <div class="videos-grid" *ngIf="!loading && publicVideos.length > 0">
+      <div class="video-card" *ngFor="let video of publicVideos">
+        <h3>{{ video.title }}</h3>
+        <div class="video-wrapper">
+          <video controls width="320" height="180">
+            <source [src]="'http://localhost:3000' + (video.url || '')" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+        <div class="video-info">
+          <p *ngIf="video.uploadedBy">Uploader: {{ video.uploadedBy?.username || 'Unknown User' }}</p>
+          <p *ngIf="!video.uploadedBy">Uploader: Unknown User</p>
+          <p>Date: {{ video.uploadedAt | date:'dd.MM.yyyy HH:mm' }}</p>
+          <p *ngIf="video.description">{{ video.description }}</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="no-videos" *ngIf="!loading && publicVideos.length === 0">
+      <p>No public videos available yet.</p>
+      <p>Check back later or upload your own public videos!</p>
+    </div>
+    
+    <div class="error-message" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+  </div>
+</div> 

@@ -5,6 +5,7 @@ export interface Video {
     description?: string;
     url: string;
     filePath?: string;
+    isPublic: boolean;
     uploadedBy: {
         _id: string;
         username: string;

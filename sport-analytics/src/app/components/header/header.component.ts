@@ -21,9 +21,23 @@ export class HeaderComponent {
     this.router.navigate(['/video-analysis']);
   }
 
+  // Navigate to community page
+  goToCommunity(): void {
+    this.router.navigate(['/community']);
+  }
+
   // Navigate to landing page
   goToLanding(): void {
-    this.router.navigate(['/landing']);
+    if (this.isLoggedIn()) {
+      this.router.navigate(['/landing']);
+    } else {
+      this.router.navigate(['/login']);
+    }
+  }
+
+  // Navigate to login page
+  goToLogin(): void {
+    this.router.navigate(['/login']);
   }
 
   // Logout user
