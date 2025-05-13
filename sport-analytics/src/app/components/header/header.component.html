@@ -19,12 +19,25 @@
       <button class="nav-button" (click)="goToCommunity()">
         Community
       </button>
+      
+      <!-- Admin link for admin users only -->
+      <button 
+        class="nav-button admin-button" 
+        *ngIf="isAdmin()" 
+        (click)="goToAdmin()"
+        title="Admin Dashboard"
+      >
+        Admin
+      </button>
     </nav>
 
     <div class="auth-buttons">
       <button class="login-button" *ngIf="!isLoggedIn()" (click)="goToLogin()">
         Login
       </button>
+      <span *ngIf="isLoggedIn() && isAdmin()" class="admin-badge" title="Admin account">
+        Admin
+      </span>
       <button class="logout-button" *ngIf="isLoggedIn()" (click)="logout()">
         Logout
       </button>
