@@ -95,6 +95,7 @@ app.get('/api/videos/public', async (req, res) => {
 // Rest der API-Routen
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/videos', require('./routes/videos'));
+app.use('/api/users', require('./routes/users'));
 
 // Error handling middleware
 app.use((err, req, res, next) => {

@@ -30,7 +30,14 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {
     // Check if user is already logged in
     if (this.authService.isLoggedIn()) {
-      this.router.navigate(['/landing']);
+      // If admin, redirect to admin dashboard
+      this.authService.checkAdminStatus().subscribe(isAdmin => {
+        if (isAdmin) {
+          this.router.navigate(['/admin']);
+        } else {
+          this.router.navigate(['/landing']);
+        }
+      });
     }
   }
 

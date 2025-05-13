@@ -68,11 +68,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   // Navigate to landing page
   goToLanding(): void {
-    if (this.isLoggedIn()) {
-      this.router.navigate(['/landing']);
-    } else {
-      this.router.navigate(['/login']);
-    }
+    this.router.navigate(['/landing']);
   }
 
   // Navigate to login page

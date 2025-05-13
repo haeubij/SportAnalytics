@@ -5,15 +5,15 @@
     </div>
     
     <nav class="nav-menu">
-      <!-- These are only for logged in users -->
-      <ng-container *ngIf="isLoggedIn()">
-        <button class="nav-button" (click)="goToLanding()">
-          Home
-        </button>
-        <button class="nav-button" (click)="goToVideoAnalysis()">
-          Video Analysis
-        </button>
-      </ng-container>
+      <!-- Home button available for everyone -->
+      <button class="nav-button" (click)="goToLanding()">
+        Home
+      </button>
+      
+      <!-- Video Analysis only for logged in users -->
+      <button class="nav-button" *ngIf="isLoggedIn()" (click)="goToVideoAnalysis()">
+        Video Analysis
+      </button>
       
       <!-- Community is available for everyone -->
       <button class="nav-button" (click)="goToCommunity()">
