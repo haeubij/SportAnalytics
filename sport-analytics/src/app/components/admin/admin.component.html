@@ -97,21 +97,21 @@
               </button>
               <button 
                 class="action-btn role-btn" 
-                (click)="toggleUserRole(user)"
+                (click)="confirmRoleChange(user)"
                 [disabled]="user.username === 'admin'"
               >
                 {{ user.role === 'admin' ? 'Als User setzen' : 'Als Admin setzen' }}
               </button>
               <button 
                 class="action-btn status-btn" 
-                (click)="toggleUserStatus(user)"
+                (click)="confirmStatusChange(user)"
                 [disabled]="user.username === 'admin'"
               >
                 {{ user.isActive ? 'Deaktivieren' : 'Aktivieren' }}
               </button>
               <button 
                 class="action-btn delete-btn" 
-                (click)="deleteUser(user._id!)"
+                (click)="confirmDeleteUser(user._id!)"
                 [disabled]="user.username === 'admin'"
               >
                 Löschen
@@ -159,7 +159,7 @@
             <td>{{ video.isPublic ? 'Öffentlich' : 'Privat' }}</td>
             <td>{{ video.uploadedAt | date:'dd.MM.yyyy HH:mm' }}</td>
             <td class="actions">
-              <button class="action-btn delete-btn" (click)="deleteVideo(video._id!)">
+              <button class="action-btn delete-btn" (click)="confirmDeleteVideo(video._id!)">
                 Löschen
               </button>
             </td>
@@ -170,6 +170,70 @@
     
     <div class="no-items" *ngIf="!loading && filteredVideos.length === 0">
       Keine Videos gefunden.
+    </div>
+  </div>
+  
+  <!-- Bestätigungsdialog für Video-Löschen -->
+  <div class="modal-backdrop" *ngIf="showDeleteDialog"></div>
+  <div class="modal" *ngIf="showDeleteDialog">
+    <div class="modal-content">
+      <h3>Video wirklich löschen?</h3>
+      <p>Dieses Video wird dauerhaft entfernt. Möchten Sie fortfahren?</p>
+      <div class="modal-actions">
+        <button class="action-btn" (click)="cancelDelete()" [disabled]="deleting">Abbrechen</button>
+        <button class="delete-btn" (click)="deleteVideoConfirmed()" [disabled]="deleting">
+          <span *ngIf="deleting" class="spinner"></span>
+          Ja, löschen
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bestätigungsdialog für User-Löschen -->
+  <div class="modal-backdrop" *ngIf="showUserDeleteDialog"></div>
+  <div class="modal" *ngIf="showUserDeleteDialog">
+    <div class="modal-content">
+      <h3>Benutzer wirklich löschen?</h3>
+      <p>Dieser Benutzer und alle seine Videos werden dauerhaft entfernt. Möchten Sie fortfahren?</p>
+      <div class="modal-actions">
+        <button class="action-btn" (click)="cancelUserDelete()" [disabled]="deletingUser">Abbrechen</button>
+        <button class="delete-btn" (click)="deleteUserConfirmed()" [disabled]="deletingUser">
+          <span *ngIf="deletingUser" class="spinner"></span>
+          Ja, löschen
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bestätigungsdialog für Rollenwechsel -->
+  <div class="modal-backdrop" *ngIf="showRoleDialog"></div>
+  <div class="modal" *ngIf="showRoleDialog">
+    <div class="modal-content">
+      <h3>Rolle ändern?</h3>
+      <p>Soll die Rolle von <b>{{ userToChangeRole?.username }}</b> wirklich zu <b>{{ newRole }}</b> geändert werden?</p>
+      <div class="modal-actions">
+        <button class="action-btn" (click)="cancelRoleChange()" [disabled]="changingRole">Abbrechen</button>
+        <button class="role-btn" (click)="changeUserRoleConfirmed()" [disabled]="changingRole">
+          <span *ngIf="changingRole" class="spinner"></span>
+          Ja, ändern
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bestätigungsdialog für Statuswechsel -->
+  <div class="modal-backdrop" *ngIf="showStatusDialog"></div>
+  <div class="modal" *ngIf="showStatusDialog">
+    <div class="modal-content">
+      <h3>Status ändern?</h3>
+      <p>Soll der Benutzer <b>{{ userToChangeStatus?.username }}</b> wirklich <b>{{ newStatus ? 'aktiviert' : 'deaktiviert' }}</b> werden?</p>
+      <div class="modal-actions">
+        <button class="action-btn" (click)="cancelStatusChange()" [disabled]="changingStatus">Abbrechen</button>
+        <button class="status-btn" (click)="changeUserStatusConfirmed()" [disabled]="changingStatus">
+          <span *ngIf="changingStatus" class="spinner"></span>
+          Ja, ändern
+        </button>
+      </div>
     </div>
   </div>
 </div> 

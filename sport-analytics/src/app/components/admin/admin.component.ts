@@ -26,6 +26,24 @@ export class AdminComponent implements OnInit {
   searchTerm: string = '';
   newPassword: string = '';
   selectedUserId: string = '';
+  showDeleteDialog: boolean = false;
+  videoToDelete: string | null = null;
+  deleting: boolean = false;
+  
+  // Dialog-States für User-Aktionen
+  showUserDeleteDialog: boolean = false;
+  userToDelete: string | null = null;
+  deletingUser: boolean = false;
+
+  showRoleDialog: boolean = false;
+  userToChangeRole: User | null = null;
+  newRole: 'admin' | 'user' | null = null;
+  changingRole: boolean = false;
+
+  showStatusDialog: boolean = false;
+  userToChangeStatus: User | null = null;
+  newStatus: boolean | null = null;
+  changingStatus: boolean = false;
   
   constructor(
     private router: Router,
@@ -208,5 +226,149 @@ export class AdminComponent implements OnInit {
       (video.description && video.description.toLowerCase().includes(term)) ||
       (video.uploadedBy && video.uploadedBy.username.toLowerCase().includes(term))
     );
+  }
+
+  // Öffnet den Bestätigungsdialog
+  confirmDeleteVideo(videoId: string): void {
+    this.videoToDelete = videoId;
+    this.showDeleteDialog = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+  }
+
+  // Löscht das Video nach Bestätigung
+  deleteVideoConfirmed(): void {
+    if (!this.videoToDelete) return;
+    this.deleting = true;
+    this.videoService.deleteVideo(this.videoToDelete).subscribe({
+      next: () => {
+        this.loadVideos();
+        this.successMessage = 'Video wurde erfolgreich gelöscht.';
+        this.deleting = false;
+        this.showDeleteDialog = false;
+        this.videoToDelete = null;
+      },
+      error: (error) => {
+        this.errorMessage = 'Fehler beim Löschen des Videos. Bitte versuchen Sie es erneut.';
+        this.deleting = false;
+        this.showDeleteDialog = false;
+        this.videoToDelete = null;
+      }
+    });
+  }
+
+  // Schließt den Dialog ohne zu löschen
+  cancelDelete(): void {
+    this.showDeleteDialog = false;
+    this.videoToDelete = null;
+  }
+
+  // Öffnet den Bestätigungsdialog für User-Löschen
+  confirmDeleteUser(userId: string): void {
+    this.userToDelete = userId;
+    this.showUserDeleteDialog = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+  }
+
+  // Löscht den User nach Bestätigung
+  deleteUserConfirmed(): void {
+    if (!this.userToDelete) return;
+    this.deletingUser = true;
+    this.userService.deleteUser(this.userToDelete).subscribe({
+      next: () => {
+        this.loadUsers();
+        this.loadVideos();
+        this.successMessage = 'Benutzer wurde erfolgreich gelöscht.';
+        this.deletingUser = false;
+        this.showUserDeleteDialog = false;
+        this.userToDelete = null;
+      },
+      error: (error) => {
+        this.errorMessage = 'Fehler beim Löschen des Benutzers. Bitte versuchen Sie es erneut.';
+        this.deletingUser = false;
+        this.showUserDeleteDialog = false;
+        this.userToDelete = null;
+      }
+    });
+  }
+
+  cancelUserDelete(): void {
+    this.showUserDeleteDialog = false;
+    this.userToDelete = null;
+  }
+
+  // Öffnet den Dialog für Rollenwechsel
+  confirmRoleChange(user: User): void {
+    this.userToChangeRole = user;
+    this.newRole = user.role === 'admin' ? 'user' : 'admin';
+    this.showRoleDialog = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+  }
+
+  changeUserRoleConfirmed(): void {
+    if (!this.userToChangeRole || !this.newRole) return;
+    this.changingRole = true;
+    this.userService.changeUserRole(this.userToChangeRole._id!, this.newRole).subscribe({
+      next: () => {
+        this.loadUsers();
+        this.successMessage = 'Benutzerrolle wurde geändert.';
+        this.changingRole = false;
+        this.showRoleDialog = false;
+        this.userToChangeRole = null;
+        this.newRole = null;
+      },
+      error: (error) => {
+        this.errorMessage = 'Fehler beim Ändern der Rolle. Bitte versuchen Sie es erneut.';
+        this.changingRole = false;
+        this.showRoleDialog = false;
+        this.userToChangeRole = null;
+        this.newRole = null;
+      }
+    });
+  }
+
+  cancelRoleChange(): void {
+    this.showRoleDialog = false;
+    this.userToChangeRole = null;
+    this.newRole = null;
+  }
+
+  // Öffnet den Dialog für Statuswechsel
+  confirmStatusChange(user: User): void {
+    this.userToChangeStatus = user;
+    this.newStatus = !user.isActive;
+    this.showStatusDialog = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+  }
+
+  changeUserStatusConfirmed(): void {
+    if (!this.userToChangeStatus || this.newStatus === null) return;
+    this.changingStatus = true;
+    this.userService.toggleUserStatus(this.userToChangeStatus._id!, this.newStatus).subscribe({
+      next: () => {
+        this.loadUsers();
+        this.successMessage = 'Benutzerstatus wurde geändert.';
+        this.changingStatus = false;
+        this.showStatusDialog = false;
+        this.userToChangeStatus = null;
+        this.newStatus = null;
+      },
+      error: (error) => {
+        this.errorMessage = 'Fehler beim Ändern des Status. Bitte versuchen Sie es erneut.';
+        this.changingStatus = false;
+        this.showStatusDialog = false;
+        this.userToChangeStatus = null;
+        this.newStatus = null;
+      }
+    });
+  }
+
+  cancelStatusChange(): void {
+    this.showStatusDialog = false;
+    this.userToChangeStatus = null;
+    this.newStatus = null;
   }
 } 
