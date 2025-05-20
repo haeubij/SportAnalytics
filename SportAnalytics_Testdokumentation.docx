@@ -1,0 +1,49 @@
+[DOCX-Dokument mit folgenden Inhalten erstellen:]
+
+1. Titel: Testdokumentation SportAnalytics
+
+2. Kapitel 4.2.5 Testfälle
+Tabelle:
+| Testfall | User Story |
+|----------|------------|
+| TF1      | Als Benutzer möchte ich mich registrieren und anmelden können. |
+| TF2      | Als Benutzer möchte ich Videos hochladen und löschen können. |
+| TF3      | Als Admin möchte ich Benutzer verwalten (löschen, Rolle ändern, Status ändern). |
+| TF4      | Als Benutzer/Admin möchte ich Videos in der Community sehen. |
+
+3. Kapitel 4.3 Testprozedur
+Für jeden Testfall eine Tabelle wie im Screenshot:
+- Beschreibung
+- Abgedeckte Anwendungsfälle
+- Ausgangssituation
+- Vorbereitungsschritte
+- Testschritte & Erwartetes Resultat
+
+Beispiel für TF1 (Registrierung):
+Beschreibung: Ein neuer Benutzer registriert sich und meldet sich an.
+Abgedeckte Anwendungsfälle: Registrierung, Login
+Ausgangssituation: Es existiert noch kein Benutzer mit diesem Namen.
+Vorbereitungsschritte: 1. Datenbank zurücksetzen, 2. Browser öffnen
+Testschritte:
+1. Registrierungsseite aufrufen → Formular wird angezeigt
+2. Felder ausfüllen → Felder werden akzeptiert
+3. Registrieren klicken → Benutzer wird angelegt
+4. Login durchführen → Startseite wird angezeigt
+
+4. Kapitel 4.4 Testprotokoll
+Tabelle wie im Screenshot:
+- Testobjekt, Version, Tester, Datum/Zeit
+- Testfall, Testschritte, Erfüllt, Bemerkung
+
+Beispiel für TF1:
+Testfall: Neuen Benutzer registrieren und anmelden
+| Testschritt | Erfüllt | Bemerkung |
+|-------------|---------|-----------|
+| 1           | [x]     |           |
+| 2           | [x]     |           |
+| 3           | [x]     |           |
+| 4           | [x]     |           |
+
+Am Ende: Speicher-/Erstellungsdatum, Seitenzahl, Projektname.
+
+[Formatierung und Tabellen wie in den Screenshots, Farben und Layout anpassen.] 
