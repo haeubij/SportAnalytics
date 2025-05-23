@@ -6,7 +6,11 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "test:components": "ng test --include=src/tests/components/**/*.spec.ts",
+    "test:services": "ng test --include=src/tests/services/**/*.spec.ts",
+    "test:models": "ng test --include=src/tests/models/**/*.spec.ts",
+    "test:coverage": "ng test --code-coverage"
   },
   "private": true,
   "dependencies": {

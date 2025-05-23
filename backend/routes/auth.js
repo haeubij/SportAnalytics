@@ -17,6 +17,11 @@ router.post('/register', async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
+    // Validate required fields
+    if (!username || !email || !password) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+
     // Prevent registering with reserved admin username
     if (username.toLowerCase() === ADMIN_USERNAME.toLowerCase()) {
       return res.status(400).json({ message: 'This username is reserved' });
@@ -51,7 +56,7 @@ router.post('/register', async (req, res) => {
       { expiresIn: '24h' },
       (err, token) => {
         if (err) throw err;
-        res.json({ token });
+        res.status(201).json({ token });
       }
     );
   } catch (err) {
