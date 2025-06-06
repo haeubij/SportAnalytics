@@ -8,6 +8,13 @@ import { UserService } from '../../services/user.service';
 import { Video } from '../../interfaces/video.interface';
 import { User } from '../../interfaces/user.interface';
 
+/**
+ * @author Janis Häubi
+ * @version 1.0.0
+ * @date 21.05.2024 (KW21)
+ * @purpose Admin-Komponente für Benutzer- und Videoverwaltung
+ * @description Ermöglicht Admins das Verwalten von Benutzern, Videos, Rollen und Passwörtern.
+ */
 @Component({
   selector: 'app-admin',
   templateUrl: './admin.component.html',
@@ -45,6 +52,13 @@ export class AdminComponent implements OnInit {
   newStatus: boolean | null = null;
   changingStatus: boolean = false;
   
+  /**
+   * Konstruktor initialisiert Router, AuthService, VideoService und UserService
+   * @param router Angular Router
+   * @param authService Service für Authentifizierung
+   * @param videoService Service für Videos
+   * @param userService Service für Benutzer
+   */
   constructor(
     private router: Router,
     private authService: AuthService,
@@ -52,34 +66,35 @@ export class AdminComponent implements OnInit {
     private userService: UserService
   ) { }
 
+  /**
+   * Initialisiert die Komponente, prüft Admin-Status und lädt Daten
+   */
   ngOnInit(): void {
-    // First use a local check to avoid delay
     if (this.authService.isAdmin()) {
       this.loadUsers();
       this.loadVideos();
     }
-    
-    // Then verify with server for security
     this.authService.checkAdminStatus().subscribe(isAdmin => {
-      console.log('Admin status in admin component:', isAdmin);
       if (!isAdmin) {
-        console.log('Not an admin, redirecting to login');
         this.router.navigate(['/login']);
         return;
       }
-      
-      // Wenn Admin-Status bestätigt ist, lade Daten
       this.loadUsers();
       this.loadVideos();
     });
   }
 
-  // Set active tab
+  /**
+   * Setzt den aktiven Tab ("videos" oder "users")
+   * @param tab Tab-Name
+   */
   setActiveTab(tab: 'videos' | 'users'): void {
     this.activeTab = tab;
   }
 
-  // Load all videos
+  /**
+   * Lädt alle Videos
+   */
   loadVideos(): void {
     this.loading = true;
     this.videoService.getVideos().subscribe({
@@ -87,14 +102,16 @@ export class AdminComponent implements OnInit {
         this.videos = videos;
         this.loading = false;
       },
-      error: (error) => {
-        this.errorMessage = 'Error loading videos. Please try again.';
+      error: () => {
+        this.errorMessage = 'Fehler beim Laden der Videos. Bitte erneut versuchen.';
         this.loading = false;
       }
     });
   }
 
-  // Load all users
+  /**
+   * Lädt alle Benutzer
+   */
   loadUsers(): void {
     this.userLoading = true;
     this.userService.getAllUsers().subscribe({
@@ -102,110 +119,129 @@ export class AdminComponent implements OnInit {
         this.users = users;
         this.userLoading = false;
       },
-      error: (error) => {
-        this.errorMessage = 'Error loading users. Please try again.';
+      error: () => {
+        this.errorMessage = 'Fehler beim Laden der Benutzer. Bitte erneut versuchen.';
         this.userLoading = false;
       }
     });
   }
 
-  // Delete video
+  /**
+   * Löscht ein Video nach Bestätigung
+   * @param videoId ID des zu löschenden Videos
+   */
   deleteVideo(videoId: string): void {
-    if (confirm('Are you sure you want to delete this video?')) {
+    if (confirm('Möchten Sie dieses Video wirklich löschen?')) {
       this.videoService.deleteVideo(videoId).subscribe({
         next: () => {
           this.loadVideos();
         },
-        error: (error) => {
-          this.errorMessage = 'Error deleting video. Please try again.';
+        error: () => {
+          this.errorMessage = 'Fehler beim Löschen des Videos. Bitte erneut versuchen.';
         }
       });
     }
   }
 
-  // Delete user
+  /**
+   * Löscht einen Benutzer nach Bestätigung
+   * @param userId ID des zu löschenden Benutzers
+   */
   deleteUser(userId: string): void {
-    if (confirm('Are you sure you want to delete this user? All their videos will also be deleted.')) {
+    if (confirm('Möchten Sie diesen Benutzer wirklich löschen? Alle zugehörigen Videos werden ebenfalls gelöscht.')) {
       this.userService.deleteUser(userId).subscribe({
         next: () => {
           this.loadUsers();
-          this.loadVideos(); // Reload videos as some might have been deleted
+          this.loadVideos();
         },
-        error: (error) => {
-          this.errorMessage = 'Error deleting user. Please try again.';
+        error: () => {
+          this.errorMessage = 'Fehler beim Löschen des Benutzers. Bitte erneut versuchen.';
         }
       });
     }
   }
 
-  // Toggle user role
+  /**
+   * Wechselt die Rolle eines Benutzers nach Bestätigung
+   * @param user Benutzerobjekt
+   */
   toggleUserRole(user: User): void {
     const newRole = user.role === 'admin' ? 'user' : 'admin';
-    if (confirm(`Are you sure you want to change this user's role to ${newRole}?`)) {
+    if (confirm(`Möchten Sie die Rolle dieses Benutzers wirklich zu ${newRole} ändern?`)) {
       this.userService.changeUserRole(user._id!, newRole).subscribe({
         next: () => {
           this.loadUsers();
         },
-        error: (error) => {
-          this.errorMessage = 'Error changing user role. Please try again.';
+        error: () => {
+          this.errorMessage = 'Fehler beim Ändern der Rolle. Bitte erneut versuchen.';
         }
       });
     }
   }
 
-  // Toggle user status
+  /**
+   * Sperrt oder entsperrt einen Benutzer nach Bestätigung
+   * @param user Benutzerobjekt
+   */
   toggleUserStatus(user: User): void {
     const newStatus = !user.isActive;
-    const message = newStatus ? 'activate' : 'deactivate';
-    
-    if (confirm(`Are you sure you want to ${message} this user?`)) {
+    const message = newStatus ? 'aktivieren' : 'deaktivieren';
+    if (confirm(`Möchten Sie diesen Benutzer wirklich ${message}?`)) {
       this.userService.toggleUserStatus(user._id!, newStatus).subscribe({
         next: () => {
           this.loadUsers();
         },
-        error: (error) => {
-          this.errorMessage = 'Error changing user status. Please try again.';
+        error: () => {
+          this.errorMessage = 'Fehler beim Ändern des Status. Bitte erneut versuchen.';
         }
       });
     }
   }
 
-  // Open password reset dialog
+  /**
+   * Öffnet das Passwort-Reset-Modal für einen Benutzer
+   * @param userId ID des Benutzers
+   */
   openPasswordReset(userId: string): void {
     this.selectedUserId = userId;
     this.newPassword = '';
   }
-  
-  // Reset user password
+
+  /**
+   * Setzt das Passwort eines Benutzers zurück
+   */
   resetPassword(): void {
     if (!this.newPassword || this.newPassword.length < 6) {
-      this.errorMessage = 'Password must be at least 6 characters';
+      this.errorMessage = 'Passwort muss mindestens 6 Zeichen lang sein';
       return;
     }
-    
     this.userService.resetUserPassword(this.selectedUserId, this.newPassword).subscribe({
       next: () => {
-        this.successMessage = 'Password reset successful';
+        this.successMessage = 'Passwort erfolgreich zurückgesetzt';
         this.selectedUserId = '';
         this.newPassword = '';
-        // Clear success message after 3 seconds
         setTimeout(() => {
           this.successMessage = '';
         }, 3000);
       },
-      error: (error) => {
-        this.errorMessage = 'Error resetting password. Please try again.';
+      error: () => {
+        this.errorMessage = 'Fehler beim Zurücksetzen des Passworts. Bitte erneut versuchen.';
       }
     });
   }
   
-  // Cancel password reset
+  /**
+   * Storniert das Passwort-Reset
+   */
   cancelPasswordReset(): void {
     this.selectedUserId = '';
     this.newPassword = '';
   }
 
-  // Filter users based on search term
+  /**
+   * Filtert Benutzer basierend auf der Suchzeichenfolge
+   * @returns Filterte Benutzer
+   */
   get filteredUsers(): User[] {
     if (!this.searchTerm) return this.users;
     
@@ -216,7 +252,10 @@ export class AdminComponent implements OnInit {
     );
   }
 
-  // Filter videos based on search term
+  /**
+   * Filtert Videos basierend auf der Suchzeichenfolge
+   * @returns Filterte Videos
+   */
   get filteredVideos(): Video[] {
     if (!this.searchTerm) return this.videos;
     
@@ -228,7 +267,10 @@ export class AdminComponent implements OnInit {
     );
   }
 
-  // Öffnet den Bestätigungsdialog
+  /**
+   * Öffnet den Bestätigungsdialog
+   * @param videoId ID des zu löschenden Videos
+   */
   confirmDeleteVideo(videoId: string): void {
     this.videoToDelete = videoId;
     this.showDeleteDialog = true;
@@ -236,7 +278,9 @@ export class AdminComponent implements OnInit {
     this.successMessage = '';
   }
 
-  // Löscht das Video nach Bestätigung
+  /**
+   * Löscht das Video nach Bestätigung
+   */
   deleteVideoConfirmed(): void {
     if (!this.videoToDelete) return;
     this.deleting = true;
@@ -257,13 +301,18 @@ export class AdminComponent implements OnInit {
     });
   }
 
-  // Schließt den Dialog ohne zu löschen
+  /**
+   * Schließt den Dialog ohne zu löschen
+   */
   cancelDelete(): void {
     this.showDeleteDialog = false;
     this.videoToDelete = null;
   }
 
-  // Öffnet den Bestätigungsdialog für User-Löschen
+  /**
+   * Öffnet den Bestätigungsdialog für User-Löschen
+   * @param userId ID des zu löschenden Benutzers
+   */
   confirmDeleteUser(userId: string): void {
     this.userToDelete = userId;
     this.showUserDeleteDialog = true;
@@ -271,7 +320,9 @@ export class AdminComponent implements OnInit {
     this.successMessage = '';
   }
 
-  // Löscht den User nach Bestätigung
+  /**
+   * Löscht den User nach Bestätigung
+   */
   deleteUserConfirmed(): void {
     if (!this.userToDelete) return;
     this.deletingUser = true;
@@ -298,7 +349,10 @@ export class AdminComponent implements OnInit {
     this.userToDelete = null;
   }
 
-  // Öffnet den Dialog für Rollenwechsel
+  /**
+   * Öffnet den Dialog für Rollenwechsel
+   * @param user Benutzerobjekt
+   */
   confirmRoleChange(user: User): void {
     this.userToChangeRole = user;
     this.newRole = user.role === 'admin' ? 'user' : 'admin';
@@ -335,7 +389,10 @@ export class AdminComponent implements OnInit {
     this.newRole = null;
   }
 
-  // Öffnet den Dialog für Statuswechsel
+  /**
+   * Öffnet den Dialog für Statuswechsel
+   * @param user Benutzerobjekt
+   */
   confirmStatusChange(user: User): void {
     this.userToChangeStatus = user;
     this.newStatus = !user.isActive;

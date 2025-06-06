@@ -5,6 +5,13 @@ import { AuthService } from '../../services/auth.service';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
+/**
+ * @author Janis Häubi
+ * @version 1.0.0
+ * @date 07.05.2024 (KW19)
+ * @purpose Header-Komponente für Navigation und Statusanzeige
+ * @description Stellt die Hauptnavigation, Admin-Status und Benutzeraktionen bereit.
+ */
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
@@ -13,19 +20,30 @@ import { filter } from 'rxjs/operators';
   imports: [CommonModule]
 })
 export class HeaderComponent implements OnInit, OnDestroy {
+  /**
+   * Gibt an, ob der aktuelle Nutzer Admin ist
+   */
   isAdminUser: boolean = false;
+  /**
+   * Subscription für Router-Events
+   */
   private routerSubscription: Subscription | null = null;
 
+  /**
+   * Konstruktor initialisiert Router und AuthService
+   * @param router Angular Router
+   * @param authService Service für Authentifizierung
+   */
   constructor(
     private router: Router,
     private authService: AuthService
   ) {}
 
+  /**
+   * Initialisiert die Komponente und prüft den Admin-Status
+   */
   ngOnInit(): void {
-    // Initial check for admin status
     this.checkAdminStatus();
-    
-    // Listen for route changes to update admin status
     this.routerSubscription = this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(() => {
@@ -33,13 +51,18 @@ export class HeaderComponent implements OnInit, OnDestroy {
       });
   }
   
+  /**
+   * Bereinigt die Subscription beim Zerstören der Komponente
+   */
   ngOnDestroy(): void {
     if (this.routerSubscription) {
       this.routerSubscription.unsubscribe();
     }
   }
 
-  // Check admin status from server when component initializes
+  /**
+   * Prüft den Admin-Status des aktuellen Nutzers
+   */
   checkAdminStatus(): void {
     if (this.authService.isLoggedIn()) {
       // First use the fast local check
@@ -56,44 +79,62 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Navigate to video analysis page
+  /**
+   * Navigiert zur Videoanalyse-Seite
+   */
   goToVideoAnalysis(): void {
     this.router.navigate(['/video-analysis']);
   }
 
-  // Navigate to community page
+  /**
+   * Navigiert zur Community-Seite
+   */
   goToCommunity(): void {
     this.router.navigate(['/community']);
   }
 
-  // Navigate to landing page
+  /**
+   * Navigiert zur Landing-Page
+   */
   goToLanding(): void {
     this.router.navigate(['/landing']);
   }
 
-  // Navigate to login page
+  /**
+   * Navigiert zur Login-Seite
+   */
   goToLogin(): void {
     this.router.navigate(['/login']);
   }
 
-  // Navigate to admin page
+  /**
+   * Navigiert zur Admin-Seite
+   */
   goToAdmin(): void {
     this.router.navigate(['/admin']);
   }
 
-  // Logout user
+  /**
+   * Loggt den Nutzer aus und setzt Admin-Status zurück
+   */
   logout(): void {
     this.authService.logout();
     this.isAdminUser = false;
     this.router.navigate(['/login']);
   }
 
-  // Check if user is logged in
+  /**
+   * Prüft, ob ein Nutzer eingeloggt ist
+   * @returns true, wenn eingeloggt
+   */
   isLoggedIn(): boolean {
     return this.authService.isLoggedIn();
   }
 
-  // Check if user is admin
+  /**
+   * Prüft, ob der aktuelle Nutzer Admin ist
+   * @returns true, wenn Admin
+   */
   isAdmin(): boolean {
     return this.isAdminUser;
   }

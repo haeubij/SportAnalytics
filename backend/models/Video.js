@@ -1,5 +1,12 @@
 const mongoose = require('mongoose');
 
+/**
+ * @author Janis Häubi
+ * @version 1.0.0
+ * @date 14.05.2024 (KW20)
+ * @purpose Video-Modell für Videodatenbank
+ * @description Definiert das Mongoose-Schema für Videos, inkl. Metadaten, Uploader und Sichtbarkeit.
+ */
 const videoSchema = new mongoose.Schema({
   title: {
     type: String,

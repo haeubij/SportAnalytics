@@ -3,15 +3,32 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Video } from '../interfaces/video.interface';
 
+/**
+ * @author Janis Häubi
+ * @version 1.0.0
+ * @date 21.05.2024 (KW21)
+ * @purpose Service für Video-Verwaltung und -Analyse
+ * @description Stellt Methoden für Video-Upload, -Abfrage, -Löschung und öffentliche Videos bereit.
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class VideoService {
+  /**
+   * URL der Backend-API
+   */
   private apiUrl = 'http://localhost:3000/api';
 
+  /**
+   * Konstruktor initialisiert HttpClient
+   * @param http Angular HttpClient
+   */
   constructor(private http: HttpClient) { }
 
-  // Hilfsfunktion, um das Token zu holen
+  /**
+   * Erstellt HTTP-Header mit Authentifizierungs-Token
+   * @returns HttpHeaders
+   */
   private getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
     return new HttpHeaders({
@@ -19,12 +36,18 @@ export class VideoService {
     });
   }
 
-  // Get all videos (requires auth)
+  /**
+   * Holt alle Videos des aktuellen Nutzers (oder alle für Admin)
+   * @returns Observable<Video[]>
+   */
   getVideos(): Observable<Video[]> {
     return this.http.get<Video[]>(`${this.apiUrl}/videos`, { headers: this.getAuthHeaders() });
   }
 
-  // Get public videos (no auth required)
+  /**
+   * Holt alle öffentlichen Videos (ohne Authentifizierung)
+   * @returns Observable<Video[]>
+   */
   getPublicVideos(): Observable<Video[]> {
     console.log('Requesting public videos directly from main server');
     // Explizit ohne Auth-Header anfragen
@@ -35,7 +58,11 @@ export class VideoService {
     });
   }
 
-  // Upload new video
+  /**
+   * Lädt ein neues Video hoch
+   * @param videoData FormData mit Videodatei und Metadaten
+   * @returns Observable<any>
+   */
   uploadVideo(videoData: FormData): Observable<any> {
     // Verwende nur den Auth-Token, ohne Content-Type zu setzen (wird automatisch für FormData gesetzt)
     const token = localStorage.getItem('token');
@@ -50,17 +77,29 @@ export class VideoService {
     });
   }
 
-  // Get video by ID
+  /**
+   * Holt ein Video anhand der ID
+   * @param id Video-ID
+   * @returns Observable<Video>
+   */
   getVideoById(id: string): Observable<Video> {
     return this.http.get<Video>(`${this.apiUrl}/videos/${id}`, { headers: this.getAuthHeaders() });
   }
 
-  // Get videos by user ID
+  /**
+   * Holt alle Videos eines bestimmten Nutzers
+   * @param userId Benutzer-ID
+   * @returns Observable<Video[]>
+   */
   getVideosByUser(userId: string): Observable<Video[]> {
     return this.http.get<Video[]>(`${this.apiUrl}/videos/user/${userId}`, { headers: this.getAuthHeaders() });
   }
 
-  // Delete video
+  /**
+   * Löscht ein Video anhand der ID
+   * @param id Video-ID
+   * @returns Observable<any>
+   */
   deleteVideo(id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/videos/${id}`, { headers: this.getAuthHeaders() });
   }

@@ -6,6 +6,14 @@ const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
 const bcrypt = require('bcryptjs');
 
+/**
+ * @author Janis Häubi
+ * @version 1.0.0
+ * @date 21.05.2024 (KW21)
+ * @purpose User-Routen für Admin
+ * @description Stellt Endpunkte für Benutzerabfrage, Löschung, Rollen- und Statusänderung bereit.
+ */
+
 // @route   GET api/users
 // @desc    Get all users (Admin only)
 // @access  Private/Admin

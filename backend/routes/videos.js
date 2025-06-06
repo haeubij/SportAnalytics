@@ -6,6 +6,14 @@ const fs = require('fs');
 const Video = require('../models/Video');
 const auth = require('../middleware/auth');
 
+/**
+ * @author Janis Häubi
+ * @version 1.0.0
+ * @date 21.05.2024 (KW21)
+ * @purpose Video-Routen
+ * @description Stellt Endpunkte für Video-Upload, Abfrage und Löschung bereit.
+ */
+
 // NOTE: The public videos route is now handled directly in server.js
 // This route is kept here as reference but is no longer used
 /*

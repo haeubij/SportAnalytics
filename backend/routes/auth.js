@@ -10,6 +10,13 @@ const ADMIN_USERNAME = 'admin';
 const ADMIN_PASSWORD = 'Y4Y4i)Dhv>0<';
 const ADMIN_EMAIL = 'admin@sportanalytics.com';
 
+/**
+ * @author Manuel Affolter
+ * @version 1.0.0
+ * @date 07.05.2024 (KW19)
+ * @purpose Authentifizierungs-Routen
+ * @description Stellt Endpunkte für Registrierung, Login, Admin-Check und Admin-Erstellung bereit.
+ */
 // @route   POST api/auth/register
 // @desc    Register user
 // @access  Public

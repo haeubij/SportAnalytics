@@ -5,6 +5,13 @@ import { Video } from '../../interfaces/video.interface';
 import { HttpClient } from '@angular/common/http';
 import { catchError, of, map } from 'rxjs';
 
+/**
+ * @author Janis Häubi
+ * @version 1.0.0
+ * @date 14.05.2024 (KW20)
+ * @purpose Community-Komponente für öffentliche Videos
+ * @description Zeigt alle öffentlichen Videos und behandelt Fehlerfälle.
+ */
 @Component({
   selector: 'app-community',
   templateUrl: './community.component.html',
@@ -14,20 +21,41 @@ import { catchError, of, map } from 'rxjs';
   providers: [DatePipe]
 })
 export class CommunityComponent implements OnInit {
+  /**
+   * Liste der öffentlichen Videos
+   */
   publicVideos: Video[] = [];
+  /**
+   * Ladezustand
+   */
   loading: boolean = false;
+  /**
+   * Fehlermeldung für das UI
+   */
   errorMessage: string = '';
 
+  /**
+   * Konstruktor initialisiert VideoService und HttpClient
+   * @param videoService Service für Videos
+   * @param http HttpClient
+   */
   constructor(
     private videoService: VideoService,
     private http: HttpClient
   ) {}
 
+  /**
+   * Initialisiert die Komponente und lädt öffentliche Videos
+   */
   ngOnInit(): void {
     this.loadPublicVideos();
   }
 
-  // Hilfsfunktion zur Konvertierung von Datumsstrings in Date-Objekte
+  /**
+   * Konvertiert Datumsstrings in Date-Objekte
+   * @param videos Array von Videos
+   * @returns Array von Videos mit Date-Objekten
+   */
   private convertDates(videos: any[]): Video[] {
     return videos.map(video => ({
       ...video,
@@ -35,7 +63,9 @@ export class CommunityComponent implements OnInit {
     })) as Video[];
   }
 
-  // Load all public videos - directly from main server
+  /**
+   * Lädt alle öffentlichen Videos vom Server
+   */
   loadPublicVideos(): void {
     this.loading = true;
     this.errorMessage = '';

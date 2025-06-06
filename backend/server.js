@@ -4,6 +4,14 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
 
+/**
+ * @author Janis Häubi
+ * @version 1.0.0
+ * @date 07.05.2024 (KW19)
+ * @purpose Hauptserver der Anwendung
+ * @description Initialisiert Express, verbindet mit MongoDB und stellt zentrale API-Endpunkte bereit.
+ */
+
 // Load environment variables
 dotenv.config();
 

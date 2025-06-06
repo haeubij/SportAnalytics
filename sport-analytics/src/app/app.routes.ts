@@ -10,6 +10,14 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { map } from 'rxjs/operators';
 
+/**
+ * @author Janis Häubi
+ * @version 1.0.0
+ * @date 07.05.2024 (KW19)
+ * @purpose Routing-Konfiguration der Anwendung
+ * @description Definiert die Routen, Route-Guards und Weiterleitungen der Angular-App.
+ */
+
 const authGuard = () => {
   const authService = inject(AuthService);
   return authService.isLoggedIn();

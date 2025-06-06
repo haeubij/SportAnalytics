@@ -1,6 +1,13 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
+/**
+ * @author Manuel Affolter
+ * @version 1.0.0
+ * @date 07.05.2024 (KW19)
+ * @purpose User-Modell für Benutzerdaten und Authentifizierung
+ * @description Definiert das Mongoose-Schema für Benutzer, inkl. Passwort-Hashing und Methoden für Authentifizierung und Passwort-Reset.
+ */
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
