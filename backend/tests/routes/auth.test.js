@@ -4,13 +4,8 @@ const User = require('../../models/User');
 const mongoose = require('mongoose');
 
 describe('Auth API', () => {
-  beforeAll(async () => {
-    await mongoose.connect('mongodb://localhost:27017/sportanalytics_test');
-  }, 10000);
-
   afterAll(async () => {
     await User.deleteMany({});
-    await mongoose.connection.close();
   }, 10000);
 
   it('should register a new user', async () => {

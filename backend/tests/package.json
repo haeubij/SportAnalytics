@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Tests for SportAnalytics backend",
   "scripts": {
-    "test": "jest",
+    "test": "jest --runInBand",
     "test:login": "node test-login.js",
     "test:models": "jest models/*.test.js",
     "test:routes": "jest routes/*.test.js",

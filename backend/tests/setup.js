@@ -5,8 +5,9 @@ beforeAll(async () => {
     await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/sport-analytics-test', {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 5000,
+      serverSelectionTimeoutMS: 30000,
       socketTimeoutMS: 45000,
+      connectTimeoutMS: 30000,
     });
     console.log('Connected to MongoDB for testing');
   } catch (error) {
