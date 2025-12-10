@@ -1,0 +1,73 @@
+<div class="landing-container">
+
+  <!-- HERO SECTION -->
+  <section class="hero-section">
+    <h1>Welcome to SportAnalytics</h1>
+    <p class="subtitle">Your Ultimate Sports Video Analysis Platform</p>
+
+    <div class="hero-actions" *ngIf="!isUserLoggedIn">
+      <button class="primary-button" (click)="goToLogin()">Login</button>
+      <button class="secondary-button" (click)="goToRegister()">Register</button>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features-section">
+    <h2>Key Features</h2>
+
+    <div class="features-grid">
+      <div class="feature-card" *ngFor="let feature of [
+        { title: 'Video Analysis', text: 'Upload and analyze your sports videos with professional tools' },
+        { title: 'Performance Tracking', text: 'Track and improve your performance with detailed analytics' },
+        { title: 'Team Collaboration', text: 'Share videos and insights with your team members' },
+        { title: 'Community', text: 'Discover public videos shared by other sports enthusiasts' }
+      ]">
+        <h3>{{ feature.title }}</h3>
+        <p>{{ feature.text }}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <h2>Ready to Get Started?</h2>
+
+    <p>
+      {{ isUserLoggedIn
+        ? 'Begin analyzing your sports videos today'
+        : 'Create an account or login to start analyzing your videos' }}
+    </p>
+
+    <button class="cta-button" (click)="goToVideoAnalysis()">
+      {{ isUserLoggedIn ? 'Go to Video Analysis' : 'Get Started Now' }}
+    </button>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="info-section">
+    <h2>How It Works</h2>
+
+    <div class="steps">
+      <div class="step" *ngFor="let step of [
+        { num: 1, title: 'Upload Your Video', text: 'Upload your sports video in any common format' },
+        { num: 2, title: 'Analyze', text: 'Use our tools to analyze performance and tactics' },
+        { num: 3, title: 'Share & Improve', text: 'Share insights and track progress' }
+      ]">
+        <div class="step-number">{{ step.num }}</div>
+        <h3>{{ step.title }}</h3>
+        <p>{{ step.text }}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMMUNITY CTA -->
+  <section class="community-section">
+    <h2>Community Videos</h2>
+    <p>Check out videos shared by other sports enthusiasts in our community</p>
+
+    <button class="community-button" (click)="goToCommunity()">
+      Browse Community Videos
+    </button>
+  </section>
+
+</div>
