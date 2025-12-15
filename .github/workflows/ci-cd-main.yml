@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    tags:
+      - "v*.*.*"
 
 permissions:
   contents: write
@@ -15,10 +17,11 @@ env:
   IMAGE_NAME: sport-analytics-backend
 
 jobs:
-  # --------------------
-  # AUTO TAG (SemVer)
-  # --------------------
+  # =====================================================
+  # 1) AUTO TAG – läuft NUR bei main (nicht bei Tags)
+  # =====================================================
   auto-tag:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.version }}
@@ -46,9 +49,9 @@ jobs:
           git tag v${{ steps.version.outputs.version }}
           git push origin v${{ steps.version.outputs.version }}
 
-  # --------------------
-  # LINT
-  # --------------------
+  # =====================================================
+  # 2) LINT
+  # =====================================================
   lint-backend:
     runs-on: ubuntu-latest
     needs: auto-tag
@@ -75,9 +78,9 @@ jobs:
       - working-directory: frontend
         run: npm run lint
 
-  # --------------------
-  # TESTS
-  # --------------------
+  # =====================================================
+  # 3) TESTS
+  # =====================================================
   test-backend:
     runs-on: ubuntu-latest
     needs: lint-backend
@@ -104,13 +107,13 @@ jobs:
       - working-directory: frontend
         run: npm test
 
-  # --------------------
-  # BUILD + ARTIFACT
-  # --------------------
+  # =====================================================
+  # 4) FRONTEND BUILD + ARTIFACT (NUR BEI TAG)
+  # =====================================================
   build-frontend:
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     needs:
-      - auto-tag
       - test-frontend
     steps:
       - uses: actions/checkout@v4
@@ -123,33 +126,34 @@ jobs:
         run: npm run build
       - uses: actions/upload-artifact@v4
         with:
-          name: frontend-build-${{ needs.auto-tag.outputs.version }}
+          name: frontend-build-${{ github.ref_name }}
           path: frontend/dist
 
-  # --------------------
-  # DOCKER
-  # --------------------
+  # =====================================================
+  # 5) BACKEND DOCKER IMAGE (NUR BEI TAG)
+  # =====================================================
   docker-backend:
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     needs:
-      - auto-tag
       - test-backend
     steps:
       - uses: actions/checkout@v4
 
       - name: Login to GHCR
         run: |
-          echo ${{ secrets.GHCR_TOKEN }} | docker login ${{ env.REGISTRY }} -u ${{ secrets.GHCR_USERNAME }} --password-stdin
+          echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io \
+            -u ${{ secrets.GHCR_USERNAME }} --password-stdin
 
       - name: Build Docker image
         working-directory: backend
         run: |
           docker build \
-            -t ${{ env.REGISTRY }}/${{ secrets.GHCR_USERNAME }}/${{ env.IMAGE_NAME }}:${{ needs.auto-tag.outputs.version }} \
-            -t ${{ env.REGISTRY }}/${{ secrets.GHCR_USERNAME }}/${{ env.IMAGE_NAME }}:latest \
+            -t ghcr.io/${{ secrets.GHCR_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }} \
+            -t ghcr.io/${{ secrets.GHCR_USERNAME }}/${{ env.IMAGE_NAME }}:latest \
             .
 
       - name: Push Docker image
         run: |
-          docker push ${{ env.REGISTRY }}/${{ secrets.GHCR_USERNAME }}/${{ env.IMAGE_NAME }}:${{ needs.auto-tag.outputs.version }}
-          docker push ${{ env.REGISTRY }}/${{ secrets.GHCR_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+          docker push ghcr.io/${{ secrets.GHCR_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+          docker push ghcr.io/${{ secrets.GHCR_USERNAME }}/${{ env.IMAGE_NAME }}:latest
