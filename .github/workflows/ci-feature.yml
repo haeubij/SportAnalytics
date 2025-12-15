@@ -6,70 +6,90 @@ on:
       - "feature/*"
   pull_request:
     branches:
-      - "main"
+      - main
+
+env:
+  NODE_VERSION: 20
 
 jobs:
-  build-and-test:
+  # --------------------
+  # LINT
+  # --------------------
+  lint-backend:
     runs-on: ubuntu-latest
-
-    env:
-      MONGODB_URI: ${{ secrets.MONGODB_URI }}
-      JWT_SECRET: ${{ secrets.JWT_SECRET }}
-      PORT: ${{ secrets.PORT }}
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 20
-
-      # Backend
-      - name: Install Backend dependencies
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install backend dependencies
         working-directory: backend
         run: npm install
-
-      - name: Lint Backend
+      - name: Lint backend
         working-directory: backend
         run: npm run lint
 
-      - name: Test Backend
-        working-directory: backend
-        run: npm test
-
-      - name: Upload Backend Test Results
-        uses: actions/upload-artifact@v4
+  lint-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          name: backend-test-results
-          path: backend/test-results/jest
-
-      # Frontend
-      - name: Install Frontend dependencies
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install frontend dependencies
         working-directory: frontend
         run: npm install
-
-      - name: Lint Frontend
+      - name: Lint frontend
         working-directory: frontend
         run: npm run lint
 
-      - name: Test Frontend
+  # --------------------
+  # TESTS
+  # --------------------
+  test-backend:
+    runs-on: ubuntu-latest
+    needs: lint-backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm install
+      - name: Test backend
+        working-directory: backend
+        run: npm test
+
+  test-frontend:
+    runs-on: ubuntu-latest
+    needs: lint-frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm install
+      - name: Test frontend
         working-directory: frontend
         run: npm test
 
-      - name: Upload Frontend Test Results
-        uses: actions/upload-artifact@v4
+  # --------------------
+  # BUILD (Verification only)
+  # --------------------
+  build-frontend:
+    runs-on: ubuntu-latest
+    needs: test-frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          name: frontend-test-results
-          path: frontend/test-results/frontend
-
-      - name: Build Frontend
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm install
+      - name: Build frontend
         working-directory: frontend
         run: npm run build
-
-      - name: Upload Frontend Build
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-build
-          path: frontend/dist
