@@ -1,0 +1,75 @@
+name: CI Feature Branch
+
+on:
+  push:
+    branches:
+      - "feature/*"
+  pull_request:
+    branches:
+      - "main"
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    env:
+      MONGODB_URI: ${{ secrets.MONGODB_URI }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      PORT: ${{ secrets.PORT }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Backend
+      - name: Install Backend dependencies
+        working-directory: backend
+        run: npm install
+
+      - name: Lint Backend
+        working-directory: backend
+        run: npm run lint
+
+      - name: Test Backend
+        working-directory: backend
+        run: npm test
+
+      - name: Upload Backend Test Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-results
+          path: backend/test-results/jest
+
+      # Frontend
+      - name: Install Frontend dependencies
+        working-directory: frontend
+        run: npm install
+
+      - name: Lint Frontend
+        working-directory: frontend
+        run: npm run lint
+
+      - name: Test Frontend
+        working-directory: frontend
+        run: npm test
+
+      - name: Upload Frontend Test Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-test-results
+          path: frontend/test-results/frontend
+
+      - name: Build Frontend
+        working-directory: frontend
+        run: npm run build
+
+      - name: Upload Frontend Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: frontend/dist
