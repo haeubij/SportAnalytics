@@ -4,8 +4,10 @@ on:
   push:
     branches:
       - main
-    tags:
-      - "v*.*.*"
+
+permissions:
+  contents: write
+  packages: write
 
 env:
   NODE_VERSION: 20
@@ -13,20 +15,43 @@ env:
   IMAGE_NAME: sport-analytics-backend
 
 jobs:
-  prepare-version:
+  # --------------------
+  # AUTO TAG (SemVer)
+  # --------------------
+  auto-tag:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.version }}
     steps:
       - uses: actions/checkout@v4
-      - id: version
-        run: |
-          VERSION=$(git describe --tags --abbrev=0 | sed 's/^v//')
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+        with:
+          fetch-depth: 0
 
+      - name: Calculate next SemVer version
+        id: version
+        run: |
+          LAST_TAG=$(git tag --sort=-v:refname | head -n 1)
+          if [ -z "$LAST_TAG" ]; then
+            NEW_VERSION="1.0.0"
+          else
+            VERSION=${LAST_TAG#v}
+            IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+            PATCH=$((PATCH+1))
+            NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+          fi
+          echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create and push git tag
+        run: |
+          git tag v${{ steps.version.outputs.version }}
+          git push origin v${{ steps.version.outputs.version }}
+
+  # --------------------
+  # LINT
+  # --------------------
   lint-backend:
     runs-on: ubuntu-latest
-    needs: prepare-version
+    needs: auto-tag
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -39,7 +64,7 @@ jobs:
 
   lint-frontend:
     runs-on: ubuntu-latest
-    needs: prepare-version
+    needs: auto-tag
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -50,6 +75,9 @@ jobs:
       - working-directory: frontend
         run: npm run lint
 
+  # --------------------
+  # TESTS
+  # --------------------
   test-backend:
     runs-on: ubuntu-latest
     needs: lint-backend
@@ -76,9 +104,14 @@ jobs:
       - working-directory: frontend
         run: npm test
 
+  # --------------------
+  # BUILD + ARTIFACT
+  # --------------------
   build-frontend:
     runs-on: ubuntu-latest
-    needs: test-frontend
+    needs:
+      - auto-tag
+      - test-frontend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -90,13 +123,16 @@ jobs:
         run: npm run build
       - uses: actions/upload-artifact@v4
         with:
-          name: frontend-build-${{ needs.prepare-version.outputs.version }}
+          name: frontend-build-${{ needs.auto-tag.outputs.version }}
           path: frontend/dist
 
+  # --------------------
+  # DOCKER
+  # --------------------
   docker-backend:
     runs-on: ubuntu-latest
     needs:
-      - prepare-version
+      - auto-tag
       - test-backend
     steps:
       - uses: actions/checkout@v4
@@ -109,11 +145,11 @@ jobs:
         working-directory: backend
         run: |
           docker build \
-            -t ${{ env.REGISTRY }}/${{ secrets.GHCR_USERNAME }}/${{ env.IMAGE_NAME }}:${{ needs.prepare-version.outputs.version }} \
+            -t ${{ env.REGISTRY }}/${{ secrets.GHCR_USERNAME }}/${{ env.IMAGE_NAME }}:${{ needs.auto-tag.outputs.version }} \
             -t ${{ env.REGISTRY }}/${{ secrets.GHCR_USERNAME }}/${{ env.IMAGE_NAME }}:latest \
             .
 
       - name: Push Docker image
         run: |
-          docker push ${{ env.REGISTRY }}/${{ secrets.GHCR_USERNAME }}/${{ env.IMAGE_NAME }}:${{ needs.prepare-version.outputs.version }}
+          docker push ${{ env.REGISTRY }}/${{ secrets.GHCR_USERNAME }}/${{ env.IMAGE_NAME }}:${{ needs.auto-tag.outputs.version }}
           docker push ${{ env.REGISTRY }}/${{ secrets.GHCR_USERNAME }}/${{ env.IMAGE_NAME }}:latest
