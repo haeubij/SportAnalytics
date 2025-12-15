@@ -93,7 +93,11 @@
             "styles": [
               "./src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [],
+            "include": [
+              "src/tests/**/*.test.ts",
+              "src/tests/**/*.spec.ts"
+            ]
           }
         },
         "lint": {
