@@ -1,0 +1,14 @@
+# Dependencies
+node_modules/
+
+# Environment – NEVER commit secrets
+.env
+
+# Logs – generated at runtime
+logs/
+*.log
+
+# OS / Editor
+.DS_Store
+.idea/
+*.swp

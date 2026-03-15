@@ -1,2 +1,14 @@
 node_modules
 .env
+
+# IDE
+.idea/
+
+# Claude Code interne Daten
+.claude/
+
+# Arbeitsnotizen (nicht für Repo bestimmt)
+skill.md
+
+# Word Lock-Files (temporär, wenn .docx geöffnet ist)
+~$*

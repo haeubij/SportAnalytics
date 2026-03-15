@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  # ─── User Service ────────────────────────────────────────────────────────────
+  user-service:
+    build: ./services/user-service
+    container_name: user-service
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - MONGODB_URI=mongodb://mongo-users:27017/users
+      - JWT_SECRET=${JWT_SECRET:-your-secret-key}
+      - KAFKA_BROKER=kafka:9092
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:4200}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    depends_on:
+      - mongo-users
+      - kafka
+    restart: unless-stopped
+    volumes:
+      - user-service-logs:/app/logs
+
+  # ─── MongoDB for User Service ────────────────────────────────────────────────
+  mongo-users:
+    image: mongo:7
+    container_name: mongo-users
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo-users-data:/data/db
+    restart: unless-stopped
+
+  # ─── Zookeeper (required by Kafka) ───────────────────────────────────────────
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    restart: unless-stopped
+
+  # ─── Kafka ────────────────────────────────────────────────────────────────────
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    restart: unless-stopped
+
+  # ─── Placeholders for colleague's services ───────────────────────────────────
+  # auth-service:
+  #   build: ./services/auth-service
+  #   ports: ["3003:3003"]
+  #   ...
+  #
+  # video-service:
+  #   build: ./services/video-service
+  #   ports: ["3002:3002"]
+  #   ...
+
+volumes:
+  mongo-users-data:
+  user-service-logs:
