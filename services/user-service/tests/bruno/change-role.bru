@@ -1,0 +1,26 @@
+meta {
+  name: Change User Role (Admin)
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/api/users/{{userId}}/role
+  body: json
+  auth: none
+}
+
+headers {
+  x-auth-token: {{adminToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "role": "admin"
+  }
+}
+
+assert {
+  res.status: eq 200
+}

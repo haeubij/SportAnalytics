@@ -1,0 +1,20 @@
+meta {
+  name: Delete User (Admin)
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/api/users/{{userId}}
+  body: none
+  auth: none
+}
+
+headers {
+  x-auth-token: {{adminToken}}
+}
+
+assert {
+  res.status: eq 200
+  res.body.message: contains deleted
+}
