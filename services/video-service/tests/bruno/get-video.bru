@@ -1,0 +1,24 @@
+meta {
+  name: Get Video Metadata
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/videos/{{videoId}}
+  body: none
+  auth: none
+}
+
+headers {
+  x-auth-token: {{authToken}}
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3003 
+}
+
+assert {
+  res.status: eq 200
+  res.body.title: isDefined
+}

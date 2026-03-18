@@ -1,0 +1,24 @@
+meta {
+  name: Delete Video
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/api/videos/{{videoId}}
+  body: none
+  auth: none
+}
+
+headers {
+  x-auth-token: {{authToken}}
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3003 
+}
+
+assert {
+  res.status: eq 200
+  res.body.message: eq Video deleted successfully
+}

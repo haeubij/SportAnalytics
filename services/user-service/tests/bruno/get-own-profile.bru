@@ -7,11 +7,15 @@ meta {
 get {
   url: {{baseUrl}}/api/users/me
   body: none
-  auth: none
+  auth: inherit
 }
 
 headers {
   x-auth-token: {{userToken}}
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3001
 }
 
 assert {

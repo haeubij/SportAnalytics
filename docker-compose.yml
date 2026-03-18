@@ -10,7 +10,7 @@ services:
     environment:
       - PORT=3001
       - MONGODB_URI=mongodb://mongo-users:27017/users
-      - JWT_SECRET=${JWT_SECRET:-your-secret-key}
+      - JWT_SECRET=f0ad7211d19eab366bd3fce55a7a33e1860ae3f36efe09e30062e7ed10dfae2766c619715d7ceec2130d06c48d1e88c79b3e244d0eccad3dad540a67098ec04a
       - KAFKA_BROKER=kafka:9092
       - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:4200}
       - LOG_LEVEL=${LOG_LEVEL:-info}
@@ -56,17 +56,71 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
     restart: unless-stopped
 
-  # ─── Placeholders for colleague's services ───────────────────────────────────
-  # auth-service:
-  #   build: ./services/auth-service
-  #   ports: ["3003:3003"]
-  #   ...
-  #
-  # video-service:
-  #   build: ./services/video-service
-  #   ports: ["3002:3002"]
-  #   ...
+  # ─── Auth Service ─────────────────────────────────────────────────────────────
+  auth-service:
+    build: ./services/auth-service
+    container_name: auth-service
+    ports:
+      - "3002:3002"
+    environment:
+      - PORT=3002
+      - MONGODB_URI=mongodb://mongo-auth:27017/auth
+      - JWT_SECRET=f0ad7211d19eab366bd3fce55a7a33e1860ae3f36efe09e30062e7ed10dfae2766c619715d7ceec2130d06c48d1e88c79b3e244d0eccad3dad540a67098ec04a
+      - JWT_EXPIRES_IN=24h
+      - KAFKA_BROKER=kafka:9092
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:4200}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    depends_on:
+      - mongo-auth
+      - kafka
+    restart: unless-stopped
+    volumes:
+      - auth-service-logs:/app/logs
+
+  # ─── MongoDB for Auth Service ─────────────────────────────────────────────────
+  mongo-auth:
+    image: mongo:7
+    container_name: mongo-auth
+    ports:
+      - "27019:27017"
+    volumes:
+      - mongo-auth-data:/data/db
+    restart: unless-stopped
+
+  # ─── Video Service ────────────────────────────────────────────────────────────
+  video-service:
+    build: ./services/video-service
+    container_name: video-service
+    ports:
+      - "3003:3003"
+    environment:
+      - PORT=3003
+      - MONGODB_URI=mongodb://mongo-videos:27017/videos
+      - JWT_SECRET=f0ad7211d19eab366bd3fce55a7a33e1860ae3f36efe09e30062e7ed10dfae2766c619715d7ceec2130d06c48d1e88c79b3e244d0eccad3dad540a67098ec04a
+      - KAFKA_BROKER=kafka:9092
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:4200}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    depends_on:
+      - mongo-videos
+      - kafka
+    restart: unless-stopped
+    volumes:
+      - video-service-logs:/app/logs
+
+  # ─── MongoDB for Video Service ────────────────────────────────────────────────
+  mongo-videos:
+    image: mongo:7
+    container_name: mongo-videos
+    ports:
+      - "27020:27017"
+    volumes:
+      - mongo-videos-data:/data/db
+    restart: unless-stopped
 
 volumes:
   mongo-users-data:
+  mongo-auth-data:
+  mongo-videos-data:
   user-service-logs:
+  auth-service-logs:
+  video-service-logs:

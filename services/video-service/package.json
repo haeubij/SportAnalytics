@@ -1,0 +1,30 @@
+{
+  "name": "video-service",
+  "version": "1.0.0",
+  "description": "Video Service Microservice for SportAnalytics",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "jest --forceExit --detectOpenHandles"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "kafkajs": "^2.2.4",
+    "mongoose": "^8.3.4",
+    "multer": "^1.4.5-lts.1",
+    "winston": "^3.13.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.3",
+    "supertest": "^7.2.2"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testTimeout": 10000
+  }
+}

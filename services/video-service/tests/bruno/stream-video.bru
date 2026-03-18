@@ -1,0 +1,23 @@
+meta {
+  name: Stream Video
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/videos/{{videoId}}/stream
+  body: none
+  auth: none
+}
+
+headers {
+  x-auth-token: {{authToken}}
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3003 
+}
+
+assert {
+  res.status: in [200, 206]
+}
