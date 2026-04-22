@@ -6,39 +6,44 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const logger = require('./utils/logger');
+const { register } = require('./utils/metrics');
+const tracingMiddleware = require('./middleware/tracing');
+const metricsMiddleware = require('./middleware/metricsMiddleware');
 
 const app = express();
 
-// CORS
 app.use(cors({
   origin: process.env.ALLOWED_ORIGINS || '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE']
 }));
 
-// Body parser
 app.use(express.json());
 
-// Request logging
+app.use(tracingMiddleware);
+
+app.use(metricsMiddleware);
+
 app.use((req, res, next) => {
-  logger.info(`${req.method} ${req.url} - IP: ${req.ip}`);
+  logger.info(`${req.method} ${req.url}`, { traceId: req.traceId, ip: req.ip });
   next();
 });
 
-// Health check
+app.get('/metrics', async (req, res) => {
+  res.set('Content-Type', register.contentType);
+  res.end(await register.metrics());
+});
+
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', service: 'auth-service' });
 });
 
-// Routes
 app.use('/api/auth', require('./routes/auth'));
 
-// Error handler
 app.use((err, req, res, next) => {
-  logger.error(`Unhandled error: ${err.message}`);
+  logger.error(`Unhandled error: ${err.message}`, { traceId: req.traceId });
   res.status(500).json({ message: 'Something went wrong!' });
 });
 
-// MongoDB connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/auth';
 
 mongoose.connect(MONGODB_URI)
