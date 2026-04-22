@@ -1,0 +1,12 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: sport-analytics
+    static_configs:
+      - targets:
+          - user-service:3001
+          - auth-service:3002
+          - video-service:3003
+    metrics_path: /metrics
