@@ -2,11 +2,18 @@ const jwt = require('jsonwebtoken');
 
 /**
  * @purpose JWT-Authentifizierungs-Middleware für den Auth Service
- * @description Liest das Token aus dem x-auth-token Header – identisch zum User Service,
- *              damit dasselbe Token in beiden Services funktioniert.
+ * @description Validiert das JWT-Token aus dem Authorization Bearer Header
+ *              oder dem x-auth-token Header.
+ *              Unterstützt OIDC-konforme JWT-Struktur (iss, sub, aud, user).
  */
 module.exports = function(req, res, next) {
-  const token = req.header('x-auth-token');
+  // Support both Bearer token (OIDC standard) and x-auth-token (legacy)
+  let token = req.header('x-auth-token');
+
+  const authHeader = req.header('Authorization');
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    token = authHeader.substring(7);
+  }
 
   if (!token) {
     return res.status(401).json({ message: 'No token, authorization denied' });
@@ -14,12 +21,10 @@ module.exports = function(req, res, next) {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
-    req.user = decoded.user;
+    // Support both OIDC-style (decoded.user) and legacy (decoded directly)
+    req.user = decoded.user || { id: decoded.sub, role: decoded.role };
     next();
   } catch (err) {
-    if (err.name === 'TokenExpiredError') {
-      return res.status(401).json({ message: 'Token expired' });
-    }
     res.status(401).json({ message: 'Token is not valid' });
   }
 };

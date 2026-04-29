@@ -3,9 +3,8 @@ const bcrypt = require('bcryptjs');
 
 /**
  * @purpose User-Modell für den Auth Service
- * @description Auth-eigene User-Collection. Passwörter werden gehasht.
- *              Das JWT-Payload wird so gebaut, dass req.user.id und req.user.role
- *              im User Service verfügbar sind (decoded.user.id / decoded.user.role).
+ * @description Mongoose-Schema für Benutzer mit Passwort-Hashing, Vergleichsmethode
+ *              und optionalen OAuth-Feldern für Google OAuth2 / OpenID Connect.
  */
 const userSchema = new mongoose.Schema({
   username: {
@@ -40,14 +39,26 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: null
   },
+  // OAuth 2.0 / OpenID Connect fields
+  oauthProvider: {
+    type: String,
+    enum: ['google', null],
+    default: null
+  },
+  oauthId: {
+    type: String,
+    default: null
+  },
   createdAt: {
     type: Date,
     default: Date.now
   }
 });
 
+// Hash password before saving (skip if already hashed via OAuth random password)
 userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();
+
   try {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
@@ -57,6 +68,7 @@ userSchema.pre('save', async function(next) {
   }
 });
 
+// Method to compare passwords
 userSchema.methods.comparePassword = async function(candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
