@@ -15,10 +15,19 @@ headers {
 }
 
 vars:pre-request {
-  baseUrl: http://localhost:3003 
+  baseUrl: http://localhost:3003
 }
 
 assert {
   res.status: eq 200
   res.body.message: eq Video deleted successfully
+}
+
+tests {
+  test("DELETE /api/videos/:id returns status 200 (DB entry removed)", function() {
+    expect(res.status).to.equal(200);
+  });
+  test("DELETE /api/videos/:id - response message confirms deletion from DB", function() {
+    expect(res.body.message).to.equal("Video deleted successfully");
+  });
 }

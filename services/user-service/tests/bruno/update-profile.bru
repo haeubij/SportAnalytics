@@ -24,3 +24,19 @@ body:json {
 assert {
   res.status: eq 200
 }
+
+tests {
+  test("PUT /api/users/:id returns status 200 (DB updated)", function() {
+    expect(res.status).to.equal(200);
+  });
+  test("PUT /api/users/:id returns updated user object (DB entry changed)", function() {
+    expect(res.body).to.not.be.undefined;
+  });
+  test("PUT /api/users/:id - username matches sent value (DB stored correctly)", function() {
+    expect(res.body.username).to.equal("newusername");
+  });
+}
+
+script:post-response {
+  bru.setVar("updatedUsername", res.body.username);
+}

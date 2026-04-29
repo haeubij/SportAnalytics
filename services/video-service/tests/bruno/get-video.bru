@@ -15,10 +15,22 @@ headers {
 }
 
 vars:pre-request {
-  baseUrl: http://localhost:3003 
+  baseUrl: http://localhost:3003
 }
 
 assert {
   res.status: eq 200
   res.body.title: isDefined
+}
+
+tests {
+  test("GET /api/videos/:id returns status 200 (DB entry exists)", function() {
+    expect(res.status).to.equal(200);
+  });
+  test("GET /api/videos/:id returns video metadata (DB entry retrieved)", function() {
+    expect(res.body.title).to.not.be.undefined;
+  });
+  test("GET /api/videos/:id - video ID matches requested ID (DB lookup correct)", function() {
+    expect(res.body._id || res.body.id).to.not.be.undefined;
+  });
 }

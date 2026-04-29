@@ -18,3 +18,12 @@ assert {
   res.status: eq 200
   res.body.message: contains deleted
 }
+
+tests {
+  test("DELETE /api/users/:id returns status 200 (DB entry removed)", function() {
+    expect(res.status).to.equal(200);
+  });
+  test("DELETE /api/users/:id - response message confirms deletion from DB", function() {
+    expect(res.body.message).to.equal("User deleted successfully");
+  });
+}

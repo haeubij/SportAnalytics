@@ -1,0 +1,21 @@
+meta {
+  name: Verify Video Deleted from DB
+  type: http
+  seq: 12
+}
+
+get {
+  url: {{baseUrl}}/api/videos/{{createdVideoId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+tests {
+  test("GET after DELETE returns 404 (DB entry removed)", function() {
+    expect(res.status).to.equal(404);
+  });
+}

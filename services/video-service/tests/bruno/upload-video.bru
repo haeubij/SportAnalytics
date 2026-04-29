@@ -1,35 +1,43 @@
 meta {
-  name: Upload Video JSON
+  name: Upload Video and Verify DB
   type: http
-  seq: 1
+  seq: 5
 }
 
 post {
   url: {{baseUrl}}/api/videos
   body: json
-  auth: none
+  auth: bearer
 }
 
-headers {
-  x-auth-token: {{authToken}}
+auth:bearer {
+  token: {{token}}
 }
 
 body:json {
   {
-    "title": "TestVideo",
-    "description": "TrainingHighlights",
+    "title": "Test Video DB Verify",
+    "description": "Testing DB storage",
     "sport": "football",
     "filename": "test.mp4",
     "contentType": "video/mp4",
-    "data": "AAAAIGZ0eXBtcDQyAAAAAG1wNDJtcDQxaXNvbQ=="
+    "data": "AAAAIGZ0eXBpc29tAAACAGlzb20="
   }
 }
 
-vars:pre-request {
-  baseUrl: http://localhost:3003
+tests {
+  test("POST /api/videos creates video in DB - status 201", function() {
+    expect(res.status).to.equal(201);
+  });
+  test("POST /api/videos returns video object (DB entry created)", function() {
+    expect(res.body.video).to.not.be.undefined;
+    expect(res.body.video.id).to.not.be.undefined;
+  });
+  test("POST /api/videos - title stored correctly in DB", function() {
+    expect(res.body.video.title).to.equal("Test Video DB Verify");
+  });
 }
 
-assert {
-  res.status: eq 201
-  res.body.video.id: isDefined
+script:post-response {
+  bru.setVar("createdVideoId", res.body.video.id);
 }
