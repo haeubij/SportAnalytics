@@ -9,6 +9,7 @@ const logger = require('./utils/logger');
 const { register } = require('./utils/metrics');
 const tracingMiddleware = require('./middleware/tracing');
 const metricsMiddleware = require('./middleware/metricsMiddleware');
+const idempotencyMiddleware = require('./middleware/idempotency');
 const { startConsumer } = require('./messaging/consumer');
 
 const app = express();
@@ -23,6 +24,8 @@ app.use(express.json());
 app.use(tracingMiddleware);
 
 app.use(metricsMiddleware);
+
+app.use(idempotencyMiddleware);
 
 app.use((req, res, next) => {
   logger.info(`${req.method} ${req.url}`, { traceId: req.traceId, ip: req.ip });

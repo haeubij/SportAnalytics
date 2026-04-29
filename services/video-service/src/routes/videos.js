@@ -7,8 +7,19 @@ const admin = require('../middleware/admin');
 const logger = require('../utils/logger');
 
 /**
- * @purpose Video Service REST API Routen
- * @description Videos werden als Blob in MongoDB GridFS gespeichert – kein Dateisystem.
+ * Idempotenz-Analyse für Video Service Endpoints:
+ *
+ * NATÜRLICH IDEMPOTENT (keine Middleware nötig):
+ *   GET   /api/videos        → lesen, keine Mutation
+ *   GET   /api/videos/:id    → lesen
+ *   DELETE /api/videos/:id   → zweiter Aufruf gibt 404, kein Datenverlust
+ *
+ * IDEMPOTENT DURCH X-Idempotency-Key HEADER:
+ *   POST  /api/videos        → ohne Key: Duplikat möglich
+ *                              mit Key: zweiter Aufruf gibt gecachten Response zurück
+ *
+ * Verwendung: Sende Header X-Idempotency-Key: <uuid> beim POST.
+ * Gleicher Key innerhalb 24h → identischer Response, kein zweiter DB-Eintrag.
  *
  * GridFS speichert Dateien in zwei Collections:
  *   videos.files   – Metadaten (filename, length, uploadDate, metadata)
