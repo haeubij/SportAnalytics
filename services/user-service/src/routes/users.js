@@ -7,9 +7,20 @@ const { publishUserDeleted } = require('../messaging/publisher');
 const logger = require('../utils/logger');
 
 /**
- * @purpose User-Service REST API Routen
- * @description Stellt Endpunkte für Benutzerverwaltung bereit.
- *              Validiert JWTs, stellt sie aber nicht aus.
+ * Idempotenz-Analyse für User Service Endpoints:
+ *
+ * NATÜRLICH IDEMPOTENT (keine Middleware nötig):
+ *   GET    /api/users          → lesen
+ *   PUT    /api/users/:id      → gleiche Daten = gleiche DB, sicher wiederholbar
+ *   PUT    /api/users/:id/role → gleiche Rolle = keine Änderung
+ *   DELETE /api/users/:id      → zweiter Aufruf gibt 404, kein Datenverlust
+ *
+ * IDEMPOTENT DURCH BUSINESS-LOGIK (auth-service):
+ *   POST /api/auth/register    → 409 Conflict bei Duplikat (email/username unique)
+ *
+ * IDEMPOTENT DURCH X-Idempotency-Key HEADER:
+ *   Alle POST-Requests auf diesem Service unterstützen
+ *   X-Idempotency-Key für explizite Idempotenz-Garantie.
  */
 
 // @route   GET /api/users

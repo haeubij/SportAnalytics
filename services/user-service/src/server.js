@@ -9,6 +9,7 @@ const logger = require('./utils/logger');
 const { register } = require('./utils/metrics');
 const tracingMiddleware = require('./middleware/tracing');
 const metricsMiddleware = require('./middleware/metricsMiddleware');
+const idempotencyMiddleware = require('./middleware/idempotency');
 const { startConsumer } = require('./messaging/consumer');
 
 const app = express();
@@ -33,6 +34,8 @@ app.get('/metrics', async (req, res) => {
   res.set('Content-Type', register.contentType);
   res.end(await register.metrics());
 });
+
+app.use(idempotencyMiddleware);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', service: 'user-service' });
