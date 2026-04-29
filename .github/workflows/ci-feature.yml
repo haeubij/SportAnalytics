@@ -76,6 +76,48 @@ jobs:
         working-directory: frontend
         run: npm test
 
+  test-user-service:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install user-service dependencies
+        working-directory: services/user-service
+        run: npm install
+      - name: Test user-service
+        working-directory: services/user-service
+        run: npm test
+
+  test-auth-service:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install auth-service dependencies
+        working-directory: services/auth-service
+        run: npm install
+      - name: Test auth-service
+        working-directory: services/auth-service
+        run: npm test
+
+  test-video-service:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install video-service dependencies
+        working-directory: services/video-service
+        run: npm install
+      - name: Test video-service
+        working-directory: services/video-service
+        run: npm test
+
   # --------------------
   # BUILD (Verification only)
   # --------------------

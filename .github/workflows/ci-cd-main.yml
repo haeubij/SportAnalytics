@@ -102,6 +102,45 @@ jobs:
       - working-directory: frontend
         run: npm test
 
+  test-user-service:
+    needs: versioning
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - working-directory: services/user-service
+        run: npm ci
+      - working-directory: services/user-service
+        run: npm test
+
+  test-auth-service:
+    needs: versioning
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - working-directory: services/auth-service
+        run: npm ci
+      - working-directory: services/auth-service
+        run: npm test
+
+  test-video-service:
+    needs: versioning
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - working-directory: services/video-service
+        run: npm ci
+      - working-directory: services/video-service
+        run: npm test
+
   # =====================================================
   # 4) FRONTEND BUILD + ARTIFACT
   # =====================================================
@@ -131,6 +170,9 @@ jobs:
     needs:
       - versioning
       - test-backend
+      - test-user-service
+      - test-auth-service
+      - test-video-service
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
